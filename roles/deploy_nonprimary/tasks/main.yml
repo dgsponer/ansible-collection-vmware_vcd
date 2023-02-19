@@ -1,0 +1,4 @@
+---
+# tasks file for deploy_nonprimary
+- include_tasks: deploy_nonprimary.yml
+  loop: "{{ vcd.cell.nonprimary }}"

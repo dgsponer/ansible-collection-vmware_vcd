@@ -1,0 +1,23 @@
+---
+# tasks file for config_db_backup
+- name: create script folder on /opt/vmware/vcloud-director/data/transfer
+  file:
+    path: /opt/vmware/vcloud-director/data/transfer/scripts
+    state: directory
+  run_once: true
+
+- name: configure /opt/vmware/vcloud-director/data/transfer/scripts/vcdpostgres_db_backup.sh
+  template:
+    src: ../templates/vcdpostgres_db_backup.sh.j2
+    dest: /opt/vmware/vcloud-director/data/transfer/scripts/vcdpostgres_db_backup.sh
+    owner: root
+    group: root
+    mode: 755
+  run_once: true
+
+- name: configure cron vcd postgres db backup
+  cron:
+    name: vcd postgres db backup
+    hour: '0'
+    minute: '0'
+    job: '/opt/vmware/vcloud-director/data/transfer/scripts/vcdpostgres_db_backup.sh'

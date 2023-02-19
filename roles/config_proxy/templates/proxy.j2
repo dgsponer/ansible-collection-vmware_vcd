@@ -1,0 +1,28 @@
+# Enable a generation of the proxy settings to the profile.
+# This setting allows to turn the proxy on and off while
+# preserving the particular proxy setup.
+#
+PROXY_ENABLED="{{ proxy.enabled }}"
+
+# Some programs (e.g. wget) support proxies, if set in
+# the environment.
+# Example: HTTP_PROXY="http://proxy.provider.de:3128/"
+HTTP_PROXY="{{ proxy.http_proxy}}:{{ proxy.http_port }}"
+
+# Example: HTTPS_PROXY="https://proxy.provider.de:3128/"
+HTTPS_PROXY="{{ proxy.https_proxy}}:{{ proxy.https_port }}"
+
+# Example: FTP_PROXY="http://proxy.provider.de:3128/"
+FTP_PROXY=""
+
+# Example: GOPHER_PROXY="http://proxy.provider.de:3128/"
+GOPHER_PROXY=""
+
+# Example: SOCKS_PROXY="socks://proxy.example.com:8080"
+SOCKS_PROXY=""
+
+# Example: SOCKS5_SERVER="office-proxy.example.com:8881"
+SOCKS5_SERVER=""
+
+# Example: NO_PROXY="www.me.de, do.main, localhost"
+NO_PROXY="{{ proxy.no_proxy }}"

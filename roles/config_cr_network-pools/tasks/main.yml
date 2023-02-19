@@ -1,0 +1,32 @@
+---
+# tasks file for config_cr_network-pools
+- name: Connect to "{{ vcd.cell.primary.0.system_name }}" and get a token
+  uri:
+    url: https://{{ vcd.cell.primary.0.system_name }}/api/sessions
+    method: POST
+    status_code: 200
+    validate_certs: no
+    headers:
+      Accept: application/*;version={{ vcd.api_version }}
+    user: "{{ vcd.username }}@system"
+    password: "{{ vcd.password }}"
+    force_basic_auth: yes
+  #until: vcd_session.status == 200
+  #retries: 100
+  #delay: 15
+  register: vcd_session
+
+- name: nsxtManagers
+  uri:
+    validate_certs: false
+    url: https://{{ vcd.cell.primary.0.system_name }}/api/admin/extension/nsxtManagers
+    status_code: [200, 400]
+    method: GET
+    headers:
+      Accept: application/*+json;version={{ vcd.api_version }}
+      Authorization: Bearer {{ vcd_session.x_vmware_vcloud_access_token }}
+  register: nsxtManagers
+
+- include_tasks: network_pools.yml
+  loop:
+    - "{{ nsxtManagers.json.nsxTManager }}"

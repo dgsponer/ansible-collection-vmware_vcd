@@ -1,0 +1,4 @@
+---
+# tasks file for deploy_primary
+- include_tasks: deploy_primary.yml
+  loop: "{{ vcd.cell.primary }}"

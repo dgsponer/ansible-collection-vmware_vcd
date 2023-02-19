@@ -1,0 +1,7 @@
+---
+# tasks file for config_trust-infra-certs
+- name: configure cron cell-management-tool trust-infra-certs
+  cron:
+    name: cell-management-tool trust-infra-certs
+    minute: '15'
+    job: '/opt/vmware/vcloud-director/bin/cell-management-tool trust-infra-certs --vsphere --unattended'

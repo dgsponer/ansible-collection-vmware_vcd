@@ -1,0 +1,67 @@
+---
+# tasks file for deploy_nonprimary
+# https://docs.vmware.com/en/VMware-Cloud-Director/10.4/VMware-Cloud-Director-Install-Configure-Upgrade-Guide/GUID-2B34775B-7C96-44F2-A9A3-D6A9D3B0CAD2.html
+- name: Deploy "{{ item.vm_name }}"
+  shell: |
+    ovftool \
+    --noSSLVerify \
+    --acceptAllEulas \
+    --X:enableHiddenProperties \
+    --datastore='{{ vcd.deployment.datastore }}' \
+    --allowAllExtraConfig  \
+    --net:"eth0 Network"="{{ vcd.deployment.eth0.network }}" \
+    --net:"eth1 Network"="{{ vcd.deployment.eth1.network }}" \
+    --name="{{ item.vm_name }}" \
+    --vmFolder="{{ vcd.deployment.folder }}" \
+    --diskMode=thin \
+    --prop:"vami.ip0.VMware_vCloud_Director"="{{ item.eth0.ip }}" \ 
+    --prop:"vami.ip1.VMware_vCloud_Director"="{{ item.eth1.ip }}" \ 
+    --prop:"vami.DNS.VMware_vCloud_Director"="{{ vcd.deployment.dns }}" \ 
+    --prop:"vami.domain.VMware_vCloud_Director"="{{ vcd.deployment.domain }}" \ 
+    --prop:"vami.gateway.VMware_vCloud_Director"="{{ vcd.deployment.gateway }}" \ 
+    --prop:"vami.netmask0.VMware_vCloud_Director"="{{ vcd.deployment.eth0.netmask }}" \ 
+    --prop:"vami.netmask1.VMware_vCloud_Director"="{{ vcd.deployment.eth1.netmask }}" \ 
+    --prop:"vami.searchpath.VMware_vCloud_Director"="{{ vcd.deployment.search }}" \ 
+    --prop:"vcloudapp.enable_ssh.VMware_vCloud_Director"="{{ vcd.deployment.enable_ssh }}" \ 
+    --prop:"vcloudapp.expire_root_password.VMware_vCloud_Director"="{{ vcd.deployment.expire_root }}" \ 
+    --prop:"vcloudapp.nfs_mount.VMware_vCloud_Director"="{{ vcd.deployment.nfs_mount }}" \ 
+    --prop:"vcloudapp.ntp-server.VMware_vCloud_Director"="{{ vcd.deployment.ntp_server }}" \ 
+    --prop:"vcloudapp.varoot-password.VMware_vCloud_Director"="{{ item.root_password }}" \ 
+    --prop:"vcloudconf.sys_name.VMware_vCloud_Director"="{{ item.system_name }}" \ 
+    --prop:"vcloudconf.ceip_enabled.VMware_vCloud_Director"="{{ vcd.deployment.ceip }}" \
+    --deploymentOption="{{ item.size }}" \ 
+    --powerOn \
+    "{{ vcd.deployment.ova }}" \ 
+    vi://{{ vcd.deployment.vce.username }}:{{ vcd.deployment.vce.password }}@{{ vcd.deployment.vce.hostname }}/{{ vcd.deployment.datacenter }}/host/{{ vcd.deployment.cluster }}
+  ignore_errors: true
+
+- name: Connect to "{{ item.system_name }}" and get a token
+  uri:
+    url: https://{{ item.system_name }}/api/sessions
+    method: POST
+    status_code: 200
+    validate_certs: no
+    headers:
+      Accept: application/*;version={{ vcd.api_version }}
+    user: "{{ vcd.username }}@system"
+    password: "{{ vcd.password }}"
+    force_basic_auth: yes
+  until: vcd_session.status == 200
+  retries: 100
+  delay: 15
+  register: vcd_session
+
+- name: Wait, that the cell "{{ item.system_name }}" is up and running
+  uri:
+    url: https://{{ item.system_name }}/cloudapi/1.0.0/cells
+    method: GET
+    status_code: 200
+    validate_certs: no
+    headers:
+      Accept: application/json;version={{ vcd.api_version }}
+      Authorization: Bearer {{ vcd_session.x_vmware_vcloud_access_token }}
+  until: vcd_cells.status == 200
+  retries: 100
+  delay: 15
+  register: vcd_cells
+  failed_when: item.system_name not in (vcd_cells.json | json_query('values[*].name'))

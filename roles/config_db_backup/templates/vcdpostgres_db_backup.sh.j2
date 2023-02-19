@@ -1,0 +1,7 @@
+a=$(curl -s -k -X GET "https://localhost:5480/api/1.0.0/isPrimary" | grep -o true)
+if [ -n "$a" ];
+then
+  echo "Primary";
+  /opt/vmware/appliance/bin/create-backup.sh vcloud
+  find /opt/vmware/vcloud-director/data/transfer/backups/backup* -mtime +10 -delete
+fi

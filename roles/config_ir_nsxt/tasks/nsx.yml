@@ -1,0 +1,25 @@
+---
+# tasks file for config_ir_vce
+- name: Register vCenter "{{ item.0.hostname }}""
+  uri:
+    validate_certs: false
+    url: https://{{ vcd.cell.primary.0.system_name }}/api/admin/extension/nsxtManagers
+    status_code: [200, 400]
+    method: POST
+    headers:
+      Content-Type: application/vnd.vmware.admin.nsxTmanager+json
+      Accept: application/*+json;version={{ vcd.api_version }}
+      Authorization: Bearer {{ vcd_session.x_vmware_vcloud_access_token }}
+    body_format: json
+    body:
+      description: "{{ item.0.hostname }}"
+      name: "{{ item.0.hostname }}"
+      url: "https://{{ item.0.hostname }}"
+      username: "{{ item.0.username }}"
+      password: "{{ item.0.password }}"
+  register: result
+
+#- name: Fail if status code 400 and vCenter is not added
+#  fail:
+#    msg: "Can't add vCenter: {{ result }}"
+#  when: result.status == 400 and 'Another vCenter found with url' not in result.json.message

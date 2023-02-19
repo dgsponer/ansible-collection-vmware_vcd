@@ -1,0 +1,10 @@
+---
+# tasks file for config_syslog
+- name: read in global.properties
+  shell: cat '/opt/vmware/vcloud-director/etc/global.properties'
+  register: global_properties
+
+- name: configure syslog "{{ syslog.hostname }}" with port "{{ syslog.port }}"
+  shell: sh /opt/vmware/vcloud-director/bin/cell-management-tool configure-audit-syslog -loghost "{{ syslog.hostname }}" -logport "{{ syslog.port }}"
+  ignore_errors: true
+  when: '"audit.syslog.host = {{ syslog.hostname}}" not in global_properties.stdout or "audit.syslog.port = {{ syslog.port}}" not in global_properties.stdout'

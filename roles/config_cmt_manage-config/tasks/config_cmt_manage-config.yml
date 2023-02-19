@@ -1,0 +1,17 @@
+---
+# tasks file for config_cmt_manage-config
+- name: Request parameter "{{ item.parameter }}"
+  shell: sh /opt/vmware/vcloud-director/bin/cell-management-tool manage-config -n '{{ item.parameter }}' -l
+  changed_when: false
+  register: result
+
+- name: Parameter not exists - Set parameter "{{ item.parameter }}" to "{{ item.value }}"
+  shell: sh /opt/vmware/vcloud-director/bin/cell-management-tool manage-config -n '{{ item.parameter }}' -v '{{ item.value }}'
+  when: '"does not exist" in result.stdout'
+  register: result_not_exists
+
+- name: Modify parameter - Set parameter "{{ item.parameter }}" to "{{ item.value }}"
+  shell: sh /opt/vmware/vcloud-director/bin/cell-management-tool manage-config -n '{{ item.parameter }}' -v '{{ item.value }}'
+  when:
+    - result_not_exists.changed != true
+    - item.value | string != (result.stdout | split('\"')).3 | string

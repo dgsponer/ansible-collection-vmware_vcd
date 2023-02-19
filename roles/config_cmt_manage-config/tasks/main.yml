@@ -1,0 +1,5 @@
+---
+# tasks file for config_cmt_manage-config
+- include_tasks: config_cmt_manage-config.yml
+  run_once: true
+  loop: "{{ vcd.advanced_settings }}"

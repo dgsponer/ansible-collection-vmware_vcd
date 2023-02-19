@@ -1,0 +1,17 @@
+---
+# tasks file for config_proxy
+- name: configure /etc/sysconfig/proxy
+  template:
+    src: proxy.j2
+    dest: /etc/sysconfig/proxy
+    owner: root
+    group: root
+    mode: 644
+
+- name: configure /opt/vmware/vcloud-director/jre/conf/net.properties
+  template:
+    src: net.properties.j2
+    dest: /opt/vmware/vcloud-director/jre/conf/net.properties
+    owner: vcloud
+    group: vcloud
+    mode: 660

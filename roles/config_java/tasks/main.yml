@@ -1,0 +1,12 @@
+---
+# tasks file for config_java
+- name: Configure java heap size
+  replace:
+    path: /opt/vmware/vcloud-director/bin/vmware-vcd-cell-common
+    regexp: 'JAVA_OPTS:--Xms1024M -Xmx4096M'
+    replace: 'JAVA_OPTS:--Xms{{ vcd.java_opts.xms }}M -Xmx{{ vcd.java_opts.xmx }}M'
+  register: result
+  notify: Service vmware-vcd restart
+  when:
+    - 'vcd.java_opts.xms is defined'
+    - 'vcd.java_opts.xmx is defined'

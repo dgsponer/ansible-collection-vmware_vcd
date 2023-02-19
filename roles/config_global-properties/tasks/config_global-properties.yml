@@ -1,0 +1,11 @@
+---
+# tasks file for config_global-properties
+- name: Add customer settings in global.properties
+  blockinfile:
+    path: "/opt/vmware/vcloud-director/etc/global.properties"
+    backup: no
+    marker: "# {mark} customer settings"
+    block: |
+      {% for item in vcd.global_properties %}
+      {{ item.parameter }} = {{ item.value}}
+      {% endfor %}

@@ -1,0 +1,45 @@
+---
+# tasks file for config_cr_network-pools
+- set_fact:
+    nsxTManager:
+      id: "{{ item.0.id }}"
+      name: "{{ item.0.name }}"
+
+- name: importableTransportZones
+  uri:
+    validate_certs: false
+    url: https://{{ vcd.cell.primary.0.system_name }}/cloudapi/1.0.0/nsxTResources/importableTransportZones?filter=_context=={{ nsxTManager.id }}
+    status_code: [200, 400]
+    method: GET
+    headers:
+      Accept: application/json;version={{ vcd.api_version }}
+      Authorization: Bearer {{ vcd_session.x_vmware_vcloud_access_token }}
+  register: importableTransportZones
+
+- debug:
+    var: (importableTransportZones.json | json_query('values[*]')).0.id
+
+- name: create networkpool
+  uri:
+    validate_certs: false
+    url: https://{{ vcd.cell.primary.0.system_name }}/cloudapi/1.0.0/networkPools
+    status_code: [202]
+    method: POST
+    headers:
+      Accept: application/json;version={{ vcd.api_version }}
+      Authorization: Bearer {{ vcd_session.x_vmware_vcloud_access_token }}
+    body_format: json
+    body:
+      name: "{{ item.0.name }}"
+      poolType: "{{ item.0.type }}"
+      promiscuousMode: false
+      backing:
+        transportZoneRef:
+          id: "{{ item.0.id }}"
+          name: "{{ item.0.name }}"
+        providerRef:
+          id: "{{ nsxTManager.id }}"
+          name: "{{ nsxTManager.name}}"
+  loop:
+    - "{{ importableTransportZones.json | json_query('values[*]') }}"
+  when: item.0.alreadyImported == false
