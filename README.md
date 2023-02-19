@@ -2,6 +2,32 @@
 
 Documentation for the collection.
 
+inventory
+```
+localhost ansible_connection=local
+
+[vcd]
+vcd001  ansible_connection=ssh  ansible_host=172.16.0.26  ansible_ssh_user=root  ansible_password=VMwareVCD1.
+vcd002  ansible_connection=ssh  ansible_host=172.16.0.27  ansible_ssh_user=root  ansible_password=VMwareVCD1.
+vcd003  ansible_connection=ssh  ansible_host=172.16.0.28  ansible_ssh_user=root  ansible_password=VMwareVCD1.
+vcd004  ansible_connection=ssh  ansible_host=172.16.0.29  ansible_ssh_user=root  ansible_password=VMwareVCD1.
+vcd005  ansible_connection=ssh  ansible_host=172.16.0.30  ansible_ssh_user=root  ansible_password=VMwareVCD1.
+
+[vcd-primary]
+vcd001
+
+[vcd-nonprimary]
+vcd002
+vcd003
+vcd004
+vcd005
+
+[vcd-db]
+vcd001
+vcd002
+vcd003
+```
+
 play.yml
 ```
 ---
