@@ -16,9 +16,6 @@
       Authorization: Bearer {{ vcd_session.x_vmware_vcloud_access_token }}
   register: importableTransportZones
 
-- debug:
-    var: (importableTransportZones.json | json_query('values[*]')).0.id
-
 - name: create networkpool
   uri:
     validate_certs: false

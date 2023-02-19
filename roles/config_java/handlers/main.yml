@@ -1,2 +1,7 @@
 ---
 # handlers file for config_java
+- name: Service vmware-vcd restart
+  systemd:
+    name: vmware-vcd
+    state: restarted
+  throttle: 1
