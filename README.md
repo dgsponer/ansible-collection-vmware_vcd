@@ -60,6 +60,7 @@ site.yml
     - config_ir_vce
     - config_ir_nsxt
     - config_cr_network-pools
+    - config_license
  
  
 - hosts: vcd
