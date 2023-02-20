@@ -1,0 +1,40 @@
+---
+# tasks file for config_license
+- name: Connect to "{{ vcd.cell.primary.0.system_name }}" and get a token
+  uri:
+    url: https://{{ vcd.cell.primary.0.system_name }}/api/sessions
+    method: POST
+    status_code: 200
+    validate_certs: no
+    headers:
+      Accept: application/*;version={{ vcd.api_version }}
+    user: "{{ vcd.username }}@system"
+    password: "{{ vcd.password }}"
+    force_basic_auth: yes
+  register: vcd_session
+
+- name: Read licenses from "{{ vcd.cell.primary.0.system_name }}"
+  uri:
+    validate_certs: false
+    url: https://{{ vcd.cell.primary.0.system_name }}/api/admin/extension/settings/license
+    status_code: [200, 400]
+    method: GET
+    headers:
+      Accept: application/vnd.vmware.admin.licenseSettings+json;version={{ vcd.api_version }}
+      Authorization: Bearer {{ vcd_session.x_vmware_vcloud_access_token }}
+  register: license
+
+- name: Set licenses to "{{ vcd.cell.primary.0.system_name }}"
+  uri:
+    validate_certs: false
+    url: https://{{ vcd.cell.primary.0.system_name }}/api/admin/extension/settings/license
+    status_code: [200, 400]
+    method: PUT
+    headers:
+      Content-Type: application/vnd.vmware.admin.licenseSettings+json
+      Accept: application/vnd.vmware.admin.licenseSettings+json;version={{ vcd.api_version }}
+      Authorization: Bearer {{ vcd_session.x_vmware_vcloud_access_token }}
+    body_format: json
+    body:
+      serialNumber: "{{ vcd.license }}"
+  when: 'vcd.license != license.json.serialNumber'

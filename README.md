@@ -81,6 +81,7 @@ var vcd
 ```
 vcd:
   api_version: 37.1
+  license: '00000-00000-00000-00000-00000'
 
   java_opts:
     xms: 2048
