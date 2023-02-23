@@ -2,7 +2,7 @@
 
 Documentation for the collection.
 
-inventory
+#inventory
 ```
 localhost ansible_connection=local
 
@@ -28,19 +28,23 @@ vcd002
 vcd003
 ```
 
-site.yml
+#site.yml
 ```
 ---
+# Day1 - Deployment
 - hosts: localhost
   gather_facts: false
   collections:
     - dholzer.vmware_vcd
 
-  roles:   
+  roles:
+    - api_session   
     - deploy_primary
     - deploy_nonprimary
 
 
+
+# Day2 - DB-nodes
 - hosts: vcd-db
   gather_facts: false
   collections:
@@ -50,25 +54,30 @@ site.yml
     - config_db_backup
  
  
+
+# Day2 - VCD settings with API
 - hosts: localhost
   gather_facts: false
   collections:
     - dholzer.vmware_vcd
  
-  roles:   
+  roles:
+    - api_session   
     - config_import_certificates
     - config_ir_vce
     - config_ir_nsxt
     - config_cr_network-pools
     - config_license
+    - config_roles
  
  
+# Day2 - VCD settings with SSH
 - hosts: vcd
   gather_facts: false
   collections:
     - dholzer.vmware_vcd
 
-  roles:   
+  roles:
     - config_cmt_manage-config
     - config_cipher
     - config_proxy
@@ -78,7 +87,7 @@ site.yml
     - config_java
 ```
 
-var vcd
+#var vcd
 ```
 vcd:
   api_version: 37.1
@@ -88,7 +97,18 @@ vcd:
     xms: 2048
     xmx: 8192
 
-  cipher: TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,TLS_RSA_WITH_AES_128_GCM_SHA256,TLS_RSA_WITH_AES_256_CBC_SHA256,TLS_ECDH_RSA_WITH_AES_256_CBC_SHA,TLS_RSA_WITH_AES_256_CBC_SHA,TLS_RSA_WITH_AES_128_CBC_SHA256,TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA,TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA,TLS_ECDH_RSA_WITH_AES_128_CBC_SHA,TLS_RSA_WITH_AES_128_CBC_SHA
+  cipher:
+    - TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA
+    - TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA
+    - TLS_RSA_WITH_AES_128_GCM_SHA256
+    - TLS_RSA_WITH_AES_256_CBC_SHA256
+    - TLS_ECDH_RSA_WITH_AES_256_CBC_SHA
+    - TLS_RSA_WITH_AES_256_CBC_SHA
+    - TLS_RSA_WITH_AES_128_CBC_SHA256
+    - TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA
+    - TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA
+    - TLS_ECDH_RSA_WITH_AES_128_CBC_SHA
+    - TLS_RSA_WITH_AES_128_CBC_SHA
 
   deployment:
     vce:
@@ -274,9 +294,20 @@ vcd:
 
     - parameter: vcloud.val.maxConcurrentValActivities
       value: 128
-```
 
-var components
+  roles:
+    - name: Admin Role
+      rights:
+        #-
+        #-
+    - name: App Launchpad Role
+      rights:
+        #-
+        #-
+
+    ```
+
+#var components
 ```
 nsx:
   - hostname: 'lab01-ntm-01.vcloud24.net'
