@@ -1,0 +1,14 @@
+---
+# tasks file for api_session
+- name: Connect to "{{ vcd.cell.primary.0.system_name }}" and get a token
+  uri:
+    url: https://{{ vcd.cell.primary.0.system_name }}/cloudapi/1.0.0/sessions/provider
+    method: POST
+    status_code: 200
+    validate_certs: no
+    headers:
+      Accept: application/*;version={{ vcd.api_version }}
+    user: "{{ vcd.username }}@system"
+    password: "{{ vcd.password }}"
+    force_basic_auth: yes
+  register: vcd_session

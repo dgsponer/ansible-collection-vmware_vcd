@@ -4,4 +4,4 @@
   shell: sh /opt/vmware/vcloud-director/bin/cell-management-tool ciphers -d
 
 - name: configure cipher
-  shell: sh /opt/vmware/vcloud-director/bin/cell-management-tool ciphers -d {{ vcd.cipher }}
+  shell: sh /opt/vmware/vcloud-director/bin/cell-management-tool ciphers -d {{ vcd.cipher | join(',') }}
