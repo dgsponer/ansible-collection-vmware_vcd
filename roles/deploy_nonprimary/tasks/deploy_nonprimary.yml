@@ -37,7 +37,7 @@
 
 - name: Connect to "{{ item.system_name }}" and get a token
   uri:
-    url: https://{{ item.system_name }}/api/sessions
+    url: https://{{ vcd.cell.primary.0.system_name }}/cloudapi/1.0.0/sessions/provider
     method: POST
     status_code: 200
     validate_certs: no
