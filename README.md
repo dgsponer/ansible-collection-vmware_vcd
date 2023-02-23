@@ -2,7 +2,7 @@
 
 Documentation for the collection.
 
-#inventory
+# inventory
 ```
 localhost ansible_connection=local
 
@@ -28,7 +28,7 @@ vcd002
 vcd003
 ```
 
-#site.yml
+# site.yml
 ```
 ---
 # Day1 - Deployment
@@ -87,7 +87,7 @@ vcd003
     - config_java
 ```
 
-#var vcd
+# var vcd
 ```
 vcd:
   api_version: 37.1
@@ -305,9 +305,9 @@ vcd:
         #-
         #-
 
-    ```
+```
 
-#var components
+# var components
 ```
 nsx:
   - hostname: 'lab01-ntm-01.vcloud24.net'
