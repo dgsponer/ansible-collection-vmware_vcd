@@ -314,6 +314,7 @@ nsx:
     username: 'admin'
     password: 'VMwareNSX1..'
     ip: 172.16.1.11
+
 vce:
   - hostname: 'lab01-vce-01.vcloud24.net'
     username: 'administrator@vsphere.local'
