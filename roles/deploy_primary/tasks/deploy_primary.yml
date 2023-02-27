@@ -43,7 +43,7 @@
 
 - name: Connect to "{{ item.system_name }}" and get a token
   uri:
-    url: https://{{ vcd.cell.primary.0.system_name }}/cloudapi/1.0.0/sessions/provider
+    url: https://{{ item.system_name }}/cloudapi/1.0.0/sessions/provider
     method: POST
     status_code: 200
     validate_certs: no
@@ -52,7 +52,7 @@
     user: "{{ vcd.username }}@system"
     password: "{{ vcd.password }}"
     force_basic_auth: yes
-  until: vcd_session.status == 200
+  until: vcd_session.status == 200 and vcd_session.x_vmware_vcloud_access_token is defined
   retries: 100
   delay: 15
   register: vcd_session
@@ -66,8 +66,8 @@
     headers:
       Accept: application/json;version={{ vcd.api_version }}
       Authorization: Bearer {{ vcd_session.x_vmware_vcloud_access_token }}
-  until: vcd_cells.status == 200
+  until: vcd_cells.status == 200 and item.system_name in (vcd_cells.json | json_query('values[*].name'))
   retries: 100
   delay: 15
   register: vcd_cells
-  failed_when: item.system_name not in (vcd_cells.json | json_query('values[*].name'))
+  #failed_when: item.system_name not in (vcd_cells.json | json_query('values[*].name'))
