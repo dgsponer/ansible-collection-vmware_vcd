@@ -38,7 +38,6 @@ vcd003
     - dholzer.vmware_vcd
 
   roles:
-    - api_session   
     - deploy_primary
     - deploy_nonprimary
 
@@ -296,15 +295,153 @@ vcd:
       value: 128
 
   roles:
-    - name: Admin Role
+    - name: SCOrgAdmin_RO
+      description: Swisscom customized read only role for Organization Administrators
+      readonly: false
+      publishAll: true
       rights:
-        #-
-        #-
-    - name: App Launchpad Role
-      rights:
-        #-
-        #-
+        - 'Access All Organization VDCs'
+        - 'Catalog: View ACL'
+        - 'Catalog: View Private and Shared Catalogs'
+        - 'Catalog: View Published Catalogs'
+        - 'General: Administrator View'
+        - 'Hybrid Cloud Operations: View from-the-cloud tunnel'
+        - 'Hybrid Cloud Operations: View to-the-cloud tunnel'
+        - 'Organization Network: View'
+        - 'Organization vDC Compute Policy: View'
+        - 'Organization vDC Distributed Firewall: View Rules'
+        - 'Organization vDC Gateway: View BGP Routing'
+        - 'Organization vDC Gateway: View DHCP'
+        - 'Organization vDC Gateway: View DNS'
+        - 'Organization vDC Gateway: View Firewall'
+        - 'Organization vDC Gateway: View IPSec VPN'
+        - 'Organization vDC Gateway: View L2 VPN'
+        - 'Organization vDC Gateway: View Load Balancer'
+        - 'Organization vDC Gateway: View NAT'
+        - 'Organization vDC Gateway: View OSPF Routing'
+        - 'Organization vDC Gateway: View Remote Access'
+        - 'Organization vDC Gateway: View SSL VPN'
+        - 'Organization vDC Gateway: View Static Routing'
+        - 'Organization vDC Gateway: View'
+        - 'Organization vDC Named Disk: View Properties'
+        - 'Organization vDC Network: View Properties'
+        - 'Organization vDC: View ACL'
+        - 'Organization vDC: View CPU and Memory Reservation'
+        - 'Organization vDC: View'
+        - 'Organization: View'
+        - 'UI Plugins: View'
+        - 'vApp Template / Media: View'
+        - 'vApp: View ACL'
+        - 'vApp: View VM metrics'
 
+    - name: SCOrgAdmin
+      description: Swisscom customized role for Organization Administrators
+      readonly: false
+      publishall: true
+      rights:
+        - 'Access All Organization VDCs'
+        - 'Catalog: Add vApp from My Cloud'
+        - 'Catalog: Change Owner'
+        - 'Catalog: CLSP Publish Subscribe'
+        - 'Catalog: Create / Delete a Catalog'
+        - 'Catalog: Edit Properties'
+        - 'Catalog: Sharing'
+        - 'Catalog: View ACL'
+        - 'Catalog: View Private and Shared Catalogs'
+        - 'Catalog: View Published Catalogs'
+        - 'Certificate Library: View'
+        - 'General: Administrator Control'
+        - 'General: Administrator View'
+        - 'General: Send Notification'
+        - 'Group / User: View'
+        - 'Hybrid Cloud Operations: Acquire control ticket'
+        - 'Hybrid Cloud Operations: Acquire from-the-cloud tunnel ticket'
+        - 'Hybrid Cloud Operations: Acquire to-the-cloud tunnel ticket'
+        - 'Hybrid Cloud Operations: Create from-the-cloud tunnel'
+        - 'Hybrid Cloud Operations: Create to-the-cloud tunnel'
+        - 'Hybrid Cloud Operations: Delete from-the-cloud tunnel'
+        - 'Hybrid Cloud Operations: Delete to-the-cloud tunnel'
+        - 'Hybrid Cloud Operations: Update from-the-cloud tunnel endpoint tag'
+        - 'Hybrid Cloud Operations: View from-the-cloud tunnel'
+        - 'Hybrid Cloud Operations: View to-the-cloud tunnel'
+        - 'Organization Network: Edit Properties'
+        - 'Organization Network: View'
+        - 'Organization vDC Compute Policy: View'
+        - 'Organization vDC Distributed Firewall: Configure Rules'
+        - 'Organization vDC Distributed Firewall: Enable/Disable'
+        - 'Organization vDC Distributed Firewall: View Rules'
+        - 'Organization vDC Gateway: Configure BGP Routing'
+        - 'Organization vDC Gateway: Configure DHCP'
+        - 'Organization vDC Gateway: Configure DNS'
+        - 'Organization vDC Gateway: Configure Firewall'
+        - 'Organization vDC Gateway: Configure IPSec VPN'
+        - 'Organization vDC Gateway: Configure L2 VPN'
+        - 'Organization vDC Gateway: Configure Load Balancer'
+        - 'Organization vDC Gateway: Configure NAT'
+        - 'Organization vDC Gateway: Configure OSPF Routing'
+        - 'Organization vDC Gateway: Configure Remote Access'
+        - 'Organization vDC Gateway: Configure SSL VPN'
+        - 'Organization vDC Gateway: Configure Static Routing'
+        - 'Organization vDC Gateway: Configure Syslog'
+        - 'Organization vDC Gateway: Distributed Routing'
+        - 'Organization vDC Gateway: View'
+        - 'Organization vDC Gateway: View BGP Routing'
+        - 'Organization vDC Gateway: View DHCP'
+        - 'Organization vDC Gateway: View DNS'
+        - 'Organization vDC Gateway: View Firewall'
+        - 'Organization vDC Gateway: View IPSec VPN'
+        - 'Organization vDC Gateway: View L2 VPN'
+        - 'Organization vDC Gateway: View Load Balancer'
+        - 'Organization vDC Gateway: View NAT'
+        - 'Organization vDC Gateway: View OSPF Routing'
+        - 'Organization vDC Gateway: View Remote Access'
+        - 'Organization vDC Gateway: View SSL VPN'
+        - 'Organization vDC Gateway: View Static Routing'
+        - 'Organization vDC Named Disk: Change Owner'
+        - 'Organization vDC Named Disk: Create'
+        - 'Organization vDC Named Disk: Delete'
+        - 'Organization vDC Named Disk: Edit Properties'
+        - 'Organization vDC Named Disk: View Properties'
+        - 'Organization vDC Network: Edit Properties'
+        - 'Organization vDC Network: View Properties'
+        - 'Organization vDC Storage Profile: Set Default'
+        - 'Organization vDC: Manage Firewall'
+        - 'Organization vDC: View'
+        - 'Organization vDC: View ACL'
+        - 'Organization vDC: View CPU and Memory Reservation'
+        - 'Organization vDC: VM-VM Affinity Edit'
+        - 'Organization: Edit Leases Policy'
+        - 'Organization: View'
+        - 'Quota Policy Capabilities: View'
+        - 'SSL Settings: View'
+        - 'SSL: Test Connection'
+        - 'UI Plugins: View'
+        - 'vApp Template / Media: Copy'
+        - 'vApp Template / Media: Create / Upload'
+        - 'vApp Template / Media: Edit'
+        - 'vApp Template / Media: View'
+        - 'vApp Template: Checkout'
+        - 'vApp Template: Download'
+        - 'vApp: Change Owner'
+        - 'vApp: Copy'
+        - 'vApp: Create / Reconfigure'
+        - 'vApp: Delete'
+        - 'vApp: Download'
+        - 'vApp: Edit Properties'
+        - 'vApp: Edit VM Compute Policy'
+        - 'vApp: Edit VM CPU'
+        - 'vApp: Edit VM Hard Disk'
+        - 'vApp: Edit VM Memory'
+        - 'vApp: Edit VM Network'
+        - 'vApp: Edit VM Properties'
+        - 'vApp: Manage VM Password Settings'
+        - 'vApp: Power Operations'
+        - 'vApp: Sharing'
+        - 'vApp: Snapshot Operations'
+        - 'vApp: Use Console'
+        - 'vApp: View ACL'
+        - 'vApp: View VM metrics'
+        - 'vApp: VM Boot Options'
 ```
 
 # var components
