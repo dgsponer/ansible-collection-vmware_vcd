@@ -1,11 +1,5 @@
 ---
 # tasks file for config_roles
-- set_fact:
-    rights: []
-
-- include_tasks: prepare_rights.yml
-  loop: "{{ item.rights }}"
-
 # Role exist?
 - name: Check role "{{ item.name }}"
   uri:
@@ -19,8 +13,8 @@
   register: get_role
   ignore_errors: true
 
-# Add Role
-- name: Add role "{{ item.name }}"
+# Create Role
+- name: Create role "{{ item.name }}"
   uri:
     validate_certs: false
     url: https://{{ vcd.cell.primary.0.system_name }}/cloudapi/1.0.0/globalRoles
@@ -33,8 +27,10 @@
     body:
       name: "{{ item.name }}"
       description: "{{ item.description }}"
+      readOnly: "{{ item.readonly | default('true') }}"
+      publishAll: "{{ item.publishall | default('false') }}"
   register: result
-  when: 'get_role.json.resultTotal != 0'
+  when: 'get_role.json.resultTotal == 0'
 
 # Modify Role
 - name: Modify role "{{ item.name }}"
@@ -50,8 +46,16 @@
     body:
       name: "{{ item.name }}"
       description: "{{ item.description }}"
+      readOnly: "{{ item.readonly | default('true') }}"
+      publishAll: "{{ item.publishall | default('false') }}"
   register: result
   when: 'get_role.json.resultTotal == 1'
+
+- set_fact:
+    rights: []
+
+- include_tasks: prepare_rights.yml
+  loop: "{{ item.rights }}"
 
 # Put Rights
 - name: Put rights to "{{ item.name }}"

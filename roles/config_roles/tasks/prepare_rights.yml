@@ -1,6 +1,6 @@
 ---
 # tasks file for config_roles
-- name: Read rights from "{{ vcd.cell.primary.0.system_name }}"
+- name: Read right "{{ item }}" from "{{ vcd.cell.primary.0.system_name }}"
   uri:
     validate_certs: false
     url: https://{{ vcd.cell.primary.0.system_name }}/cloudapi/1.0.0/rights?filter=name=={{ item | urlencode }}
