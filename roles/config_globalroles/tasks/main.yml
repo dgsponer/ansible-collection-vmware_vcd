@@ -1,0 +1,4 @@
+---
+# tasks file for config_globalroles
+- include_tasks: generate_roles.yml
+  loop: "{{ vcd.roles }}"

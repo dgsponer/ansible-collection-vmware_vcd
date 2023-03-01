@@ -1,0 +1,87 @@
+---
+# tasks file for config_globalroles
+- name: Configure globalRole "{{ item.name }}"
+  vcd_roles:
+    user: "{{ vcd.username }}"
+    password: "{{ vcd.password }}"
+    host: "{{ vcd.cell.primary.0.system_name }}"
+    org: system
+    api_version: "{{ vcd.api_version }}"
+    verify_ssl_certs: False
+    role_name: "{{ item.name }}"
+    role_description: "{{ item.description }}"
+    role_rights: "{{ item.rights }}"
+    state: "{{ item.state }}"
+
+## Role exist?
+#- name: Check role "{{ item.name }}"
+#  uri:
+#    validate_certs: false
+#    url: https://{{ vcd.cell.primary.0.system_name }}/cloudapi/1.0.0/globalRoles?filter=name=={{ item.name | urlencode }}
+#    status_code: [200, 400]
+#    method: Get
+#    headers:
+#      Accept: application/json;version={{ vcd.api_version }}
+#      Authorization: Bearer {{ vcd_session.x_vmware_vcloud_access_token }}
+#  register: get_role
+#  ignore_errors: true
+#
+## Create Role
+#- name: Create role "{{ item.name }}"
+#  uri:
+#    validate_certs: false
+#    url: https://{{ vcd.cell.primary.0.system_name }}/cloudapi/1.0.0/globalRoles
+#    status_code: [201, 400]
+#    method: POST
+#    headers:
+#      Accept: application/json;version={{ vcd.api_version }}
+#      Authorization: Bearer {{ vcd_session.x_vmware_vcloud_access_token }}
+#    body_format: json
+#    body:
+#      name: "{{ item.name }}"
+#      description: "{{ item.description }}"
+#      readOnly: "{{ item.readonly | default('true') }}"
+#      publishAll: "{{ item.publishall | default('false') }}"
+#  register: result
+#  when: 'get_role.json.resultTotal == 0'
+#
+## Modify Role
+#- name: Modify role "{{ item.name }}"
+#  uri:
+#    validate_certs: false
+#    url: https://{{ vcd.cell.primary.0.system_name }}/cloudapi/1.0.0/globalRoles/{{ (get_role.json | json_query('values[*].id')).0 }}
+#    status_code: [200, 400]
+#    method: PUT
+#    headers:
+#      Accept: application/json;version={{ vcd.api_version }}
+#      Authorization: Bearer {{ vcd_session.x_vmware_vcloud_access_token }}
+#    body_format: json
+#    body:
+#      name: "{{ item.name }}"
+#      description: "{{ item.description }}"
+#      readOnly: "{{ item.readonly | default('true') }}"
+#      publishAll: "{{ item.publishall | default('false') }}"
+#  register: result
+#  when: 'get_role.json.resultTotal == 1'
+#
+#- set_fact:
+#    rights: []
+#
+#- include_tasks: prepare_rights.yml
+#  loop: "{{ item.rights }}"
+#
+## Put Rights
+#- name: Put rights to "{{ item.name }}"
+#  uri:
+#    validate_certs: false
+#    url: https://{{ vcd.cell.primary.0.system_name }}/cloudapi/1.0.0/globalRoles/{{ (get_role.json | json_query('values[*].id')).0 }}/rights
+#    status_code: [200, 400]
+#    method: PUT
+#    headers:
+#      Accept: application/json;version={{ vcd.api_version }}
+#      Authorization: Bearer {{ vcd_session.x_vmware_vcloud_access_token }}
+#    body_format: json
+#    body:
+#      values: "{{ rights }}"
+#  register: result
+#  when: 'get_role.json.resultTotal == 1'

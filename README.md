@@ -67,7 +67,7 @@ vcd003
     - config_ir_nsxt
     - config_cr_network-pools
     - config_license
-    - config_roles
+    - config_globalroles
  
  
 # Day2 - VCD settings with SSH
