@@ -1,0 +1,22 @@
+---
+# tasks file for config_pvdcs
+- name: Configure PVDC "{{ item.pvdcs }}"
+  vcd_pvdc:
+    user: "{{ vcd.username }}"
+    password: "{{ vcd.password }}"
+    host: "{{ vcd.cell.primary.0.system_name }}"
+    org: system
+    api_version: "{{ vcd.api_version }}"
+    verify_ssl_certs: False
+    provider_vdc_name: "{{ item.name }}"
+    description: "{{ item.description }}"
+    storage_profiles: "{{ item.storage }}"
+    vcenter_name: "{{ item.vcenter_name }}"
+    resource_pool_cluster_name: "{{ item.clustername }}"
+    resource_pool_name: "{{ item.resourcepool }}"
+    highest_hw_version: "{{ item.hw_version }}"
+    nsxt_manager_name: "{{ nsx.0.hostname }}"
+    network_pool_name: "{{ item.network_pool_name }}"
+    is_enabled: "{{ item.is_enable }}"
+    force_delete: False
+    state: "{{ item.state }}"

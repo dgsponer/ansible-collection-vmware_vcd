@@ -1,5 +1,5 @@
 ---
-# tasks file for config_globalroles
+# tasks file for config_global-roles
 - name: Read right "{{ item }}" from "{{ vcd.cell.primary.0.system_name }}"
   uri:
     validate_certs: false

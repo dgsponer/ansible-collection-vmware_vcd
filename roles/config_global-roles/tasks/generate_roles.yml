@@ -1,5 +1,5 @@
 ---
-# tasks file for config_globalroles
+# tasks file for config_global-roles
 - name: Configure globalRole "{{ item.name }}"
   vcd_roles:
     user: "{{ vcd.username }}"

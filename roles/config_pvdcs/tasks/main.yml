@@ -1,0 +1,4 @@
+---
+# tasks file for config_pvdcs
+- include_tasks: generate_pvdcs.yml
+  loop: "{{ vcd.pvdcs }}"
