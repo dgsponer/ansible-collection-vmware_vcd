@@ -68,8 +68,10 @@ vcd003
     - config_cr_network-pools
     - config_license
     - config_global-roles
- 
- 
+    - config_pvdcs
+
+
+
 # Day2 - VCD settings with SSH
 - hosts: vcd
   gather_facts: false
@@ -305,8 +307,8 @@ vcd:
         - 'Catalog: View Private and Shared Catalogs'
         - 'Catalog: View Published Catalogs'
         - 'General: Administrator View'
-        - 'Hybrid Cloud Operations: View from-the-cloud tunnel'
-        - 'Hybrid Cloud Operations: View to-the-cloud tunnel'
+        #- 'Hybrid Cloud Operations: View from-the-cloud tunnel'
+        #- 'Hybrid Cloud Operations: View to-the-cloud tunnel'
         - 'Organization Network: View'
         - 'Organization vDC Compute Policy: View'
         - 'Organization vDC Distributed Firewall: View Rules'
@@ -354,16 +356,16 @@ vcd:
         - 'General: Administrator View'
         - 'General: Send Notification'
         - 'Group / User: View'
-        - 'Hybrid Cloud Operations: Acquire control ticket'
-        - 'Hybrid Cloud Operations: Acquire from-the-cloud tunnel ticket'
-        - 'Hybrid Cloud Operations: Acquire to-the-cloud tunnel ticket'
-        - 'Hybrid Cloud Operations: Create from-the-cloud tunnel'
-        - 'Hybrid Cloud Operations: Create to-the-cloud tunnel'
-        - 'Hybrid Cloud Operations: Delete from-the-cloud tunnel'
-        - 'Hybrid Cloud Operations: Delete to-the-cloud tunnel'
-        - 'Hybrid Cloud Operations: Update from-the-cloud tunnel endpoint tag'
-        - 'Hybrid Cloud Operations: View from-the-cloud tunnel'
-        - 'Hybrid Cloud Operations: View to-the-cloud tunnel'
+        #- 'Hybrid Cloud Operations: Acquire control ticket'
+        #- 'Hybrid Cloud Operations: Acquire from-the-cloud tunnel ticket'
+        #- 'Hybrid Cloud Operations: Acquire to-the-cloud tunnel ticket'
+        #- 'Hybrid Cloud Operations: Create from-the-cloud tunnel'
+        #- 'Hybrid Cloud Operations: Create to-the-cloud tunnel'
+        #- 'Hybrid Cloud Operations: Delete from-the-cloud tunnel'
+        #- 'Hybrid Cloud Operations: Delete to-the-cloud tunnel'
+        #- 'Hybrid Cloud Operations: Update from-the-cloud tunnel endpoint tag'
+        #- 'Hybrid Cloud Operations: View from-the-cloud tunnel'
+        #- 'Hybrid Cloud Operations: View to-the-cloud tunnel'
         - 'Organization Network: Edit Properties'
         - 'Organization Network: View'
         - 'Organization vDC Compute Policy: View'
@@ -442,6 +444,59 @@ vcd:
         - 'vApp: View ACL'
         - 'vApp: View VM metrics'
         - 'vApp: VM Boot Options'
+
+  pvdcs:
+    - name: siteA
+      description: siteA
+      vcenter_name: lab01-vce-01.vcloud24.net
+      state: absent
+      is_enable: true
+      clustername: lab01
+      resourcepool: vcd_siteA
+      hw_version: vmx-19
+      network_pool_name: nsx-overlay-transportzone
+      storage:
+        - vmw_vsphere
+        - vmw_vsphere_bkp
+
+    - name: siteB
+      description: siteB
+      vcenter_name: lab01-vce-01.vcloud24.net
+      state: absent
+      is_enable: true
+      clustername: lab01
+      resourcepool: vcd_siteB
+      hw_version: vmx-19
+      network_pool_name: nsx-overlay-transportzone
+      storage:
+        - vmw_vsphere
+        - vmw_vsphere_bkp
+
+    - name: stretchedAB
+      description: stretchedAB
+      vcenter_name: lab01-vce-01.vcloud24.net
+      state: absent
+      is_enable: true
+      clustername: lab01
+      resourcepool: vcd_stretchedAB
+      hw_version: vmx-19
+      network_pool_name: nsx-overlay-transportzone
+      storage:
+        - vmw_vsphere
+        - vmw_vsphere_bkp
+
+    - name: stretchedBA
+      description: stretchedBA
+      vcenter_name: lab01-vce-01.vcloud24.net
+      state: absent
+      is_enable: true
+      clustername: lab01
+      resourcepool: vcd_stretchedBA
+      hw_version: vmx-19
+      network_pool_name: nsx-overlay-transportzone
+      storage:
+        - vmw_vsphere
+        - vmw_vsphere_bkp
 ```
 
 # var components
