@@ -448,8 +448,7 @@ vcd:
   pvdcs:
     - name: siteA
       description: siteA
-      vcenter_name: lab01-vce-01.vcloud24.net
-      state: absent
+      state: present
       is_enable: true
       clustername: lab01
       resourcepool: vcd_siteA
@@ -461,8 +460,7 @@ vcd:
 
     - name: siteB
       description: siteB
-      vcenter_name: lab01-vce-01.vcloud24.net
-      state: absent
+      state: present
       is_enable: true
       clustername: lab01
       resourcepool: vcd_siteB
@@ -474,8 +472,7 @@ vcd:
 
     - name: stretchedAB
       description: stretchedAB
-      vcenter_name: lab01-vce-01.vcloud24.net
-      state: absent
+      state: present
       is_enable: true
       clustername: lab01
       resourcepool: vcd_stretchedAB
@@ -487,8 +484,7 @@ vcd:
 
     - name: stretchedBA
       description: stretchedBA
-      vcenter_name: lab01-vce-01.vcloud24.net
-      state: absent
+      state: present
       is_enable: true
       clustername: lab01
       resourcepool: vcd_stretchedBA

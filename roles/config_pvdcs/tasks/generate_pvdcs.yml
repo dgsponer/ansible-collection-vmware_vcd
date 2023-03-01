@@ -1,6 +1,6 @@
 ---
 # tasks file for config_pvdcs
-- name: Configure PVDC "{{ item.pvdcs }}"
+- name: Configure PVDC "{{ item.name }}"
   vcd_pvdc:
     user: "{{ vcd.username }}"
     password: "{{ vcd.password }}"
@@ -11,7 +11,7 @@
     provider_vdc_name: "{{ item.name }}"
     description: "{{ item.description }}"
     storage_profiles: "{{ item.storage }}"
-    vcenter_name: "{{ item.vcenter_name }}"
+    vcenter_name: "{{ vce.0.hostname }}"
     resource_pool_cluster_name: "{{ item.clustername }}"
     resource_pool_name: "{{ item.resourcepool }}"
     highest_hw_version: "{{ item.hw_version }}"
