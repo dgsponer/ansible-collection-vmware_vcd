@@ -1,0 +1,93 @@
+---
+# tasks file for config_placement-policy
+- name: Get vdcComputePolicies from "{{ inventory_hostname }}"
+  uri:
+    validate_certs: false
+    url: https://{{ inventory_hostname }}/cloudapi/1.0.0/vdcComputePolicies
+    status_code: [200, 400]
+    method: GET
+    headers:
+      Accept: application/json;version={{ vcd.api_version }}
+      Authorization: Bearer {{ vcd_session.x_vmware_vcloud_access_token }}
+  register: vdcComputePolicies
+  delegate_to: '{{ vcd.api_host }}'
+
+- debug:
+    var: vdcComputePolicies.json
+    verbosity: 1
+
+- debug:
+    var: item.name
+    verbosity: 1
+
+- debug:
+    var: (vdcComputePolicies | json_query('json.values[?name==`' + item.name + '`].id')).0
+    verbosity: 1
+
+- name: Get vdcComputePolicy "{{ item.name }}"
+  uri:
+    validate_certs: false
+    url: https://{{ inventory_hostname }}/cloudapi/1.0.0/vdcComputePolicies/{{ (vdcComputePolicies | json_query('json.values[?name==`' + item.name + '`].id')).0 }}
+    method: GET
+    status_code: [200, 404]
+    headers:
+      Accept: application/json;version={{ vcd.api_version }}
+      Authorization: Bearer {{ vcd_session.x_vmware_vcloud_access_token }}
+  when: (vdcComputePolicies | json_query('json.values[?name==`' + item.name + '`].id')).0 is defined
+  register: vdcComputePolicy
+  delegate_to: '{{ vcd.api_host }}'
+
+- debug:
+    var: vdcComputePolicy
+    verbosity: 1
+
+- name: init list vmgroups
+  set_fact:
+    vmgroups: []
+
+- name: Generate VM-Groups
+  include_tasks: generate_vmgroups.yml
+  loop: "{{ item.vmgroups }}"
+
+- debug:
+    var: vmgroups
+    verbosity: 1
+
+- name: Create vdcComputePolicy "{{ item.name }}"
+  uri:
+    validate_certs: false
+    url: https://{{ inventory_hostname }}/cloudapi/1.0.0/vdcComputePolicies
+    method: POST
+    status_code: [201]
+    headers:
+      Accept: application/json;version={{ vcd.api_version }}
+      Authorization: Bearer {{ vcd_session.x_vmware_vcloud_access_token }}
+    body_format: json
+    body:
+      name: "{{ item.name }}"
+      description: "{{ item.description }}"
+      pvdcId: "{{ (providerVdcs | json_query('json.values[?name==`' + item.pvdc + '`].id')).0 }}"
+      namedVmGroups:
+        - "{{ vmgroups }}"
+  when: (vdcComputePolicies | json_query('json.values[?name==`' + item.name + '`].id')).0 is not defined
+  delegate_to: '{{ vcd.api_host }}'
+
+- name: Update vdcComputePolicy "{{ item.name }}"
+  uri:
+    validate_certs: false
+    url: https://{{ inventory_hostname }}/cloudapi/1.0.0/vdcComputePolicies/{{ (vdcComputePolicies | json_query('json.values[?name==`' + item.name + '`].id')).0 }}
+    method: PUT
+    status_code: [200]
+    headers:
+      Accept: application/json;version={{ vcd.api_version }}
+      Authorization: Bearer {{ vcd_session.x_vmware_vcloud_access_token }}
+    body_format: json
+    body:
+      name: "{{ item.name }}"
+      description: "{{ item.description }}"
+      pvdcId: "{{ (providerVdcs | json_query('json.values[?name==`' + item.pvdc + '`].id')).0 }}"
+      namedVmGroups:
+        - "{{ vmgroups }}"
+  when: (vdcComputePolicies | json_query('json.values[?name==`' + item.name + '`].id')).0 is defined
+  register: vdcComputePolicy
+  delegate_to: '{{ vcd.api_host }}'

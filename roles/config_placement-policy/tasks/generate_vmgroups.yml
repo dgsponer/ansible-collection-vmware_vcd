@@ -1,0 +1,9 @@
+- name: create vmgroup
+  set_fact:
+    vmgroup:
+      - name: "{{ item }}"
+        id: "{{ (namedVmGroupReferences | json_query('json.vmGroupReference[?name==`' + item + '`].id')).0 }}"
+
+- name: add vmgroup to vmgroups
+  set_fact:
+    vmgroups: '{{ vmgroups + vmgroup }}'

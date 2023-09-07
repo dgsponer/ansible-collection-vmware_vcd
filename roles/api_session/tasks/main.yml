@@ -12,3 +12,4 @@
     password: "{{ vcd.password }}"
     force_basic_auth: yes
   register: vcd_session
+  delegate_to: localhost
