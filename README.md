@@ -1,4 +1,4 @@
-# Ansible Collection - dholzer.vmware_vcd
+# Ansible Collection - dgsponer.vmware_vcd
 
 Documentation for the collection.
 
@@ -7,25 +7,27 @@ Documentation for the collection.
 localhost ansible_connection=local
 
 [vcd]
-vcd001  ansible_connection=ssh  ansible_host=172.16.0.26  ansible_ssh_user=root  ansible_password=VMwareVCD1.
-vcd002  ansible_connection=ssh  ansible_host=172.16.0.27  ansible_ssh_user=root  ansible_password=VMwareVCD1.
-vcd003  ansible_connection=ssh  ansible_host=172.16.0.28  ansible_ssh_user=root  ansible_password=VMwareVCD1.
-vcd004  ansible_connection=ssh  ansible_host=172.16.0.29  ansible_ssh_user=root  ansible_password=VMwareVCD1.
-vcd005  ansible_connection=ssh  ansible_host=172.16.0.30  ansible_ssh_user=root  ansible_password=VMwareVCD1.
+lab01-vcd-01.vcloud24.net  ansible_connection=ssh  ansible_host=172.16.1.7  ansible_ssh_user=root  ansible_password=VMwareVCD1.
+lab01-vcd-02.vcloud24.net  ansible_connection=ssh  ansible_host=172.16.1.8  ansible_ssh_user=root  ansible_password=VMwareVCD1.
+lab01-vcd-03.vcloud24.net  ansible_connection=ssh  ansible_host=172.16.1.9  ansible_ssh_user=root  ansible_password=VMwareVCD1.
+lab01-vcd-04.vcloud24.net  ansible_connection=ssh  ansible_host=172.16.1.10  ansible_ssh_user=root  ansible_password=VMwareVCD1.
+lab01-vcd-05.vcloud24.net  ansible_connection=ssh  ansible_host=172.16.1.11  ansible_ssh_user=root  ansible_password=VMwareVCD1.
 
 [vcd-primary]
-vcd001
+lab01-vcd-01.vcloud24.net
 
-[vcd-nonprimary]
-vcd002
-vcd003
-vcd004
-vcd005
+[vcd-standby]
+lab01-vcd-02.vcloud24.net
+lab01-vcd-03.vcloud24.net
+
+[vcd-application]
+lab01-vcd-04.vcloud24.net
+lab01-vcd-05.vcloud24.net
 
 [vcd-db]
-vcd001
-vcd002
-vcd003
+lab01-vcd-01.vcloud24.net
+lab01-vcd-02.vcloud24.net
+lab01-vcd-03.vcloud24.net
 ```
 
 # site.yml
@@ -35,7 +37,7 @@ vcd003
 - hosts: localhost
   gather_facts: false
   collections:
-    - dholzer.vmware_vcd
+    - dgsponer.vmware_vcd
 
   roles:
     - deploy_primary
@@ -47,7 +49,7 @@ vcd003
 - hosts: vcd-db
   gather_facts: false
   collections:
-    - dholzer.vmware_vcd
+    - dgsponer.vmware_vcd
  
   roles:   
     - config_db_backup
@@ -58,7 +60,7 @@ vcd003
 - hosts: localhost
   gather_facts: false
   collections:
-    - dholzer.vmware_vcd
+    - dgsponer.vmware_vcd
  
   roles:
     - api_session   
@@ -68,6 +70,7 @@ vcd003
     - config_cr_network-pools
     - config_license
     - config_global-roles
+    - config_placement-policy
     - config_pvdcs
 
 
@@ -76,7 +79,7 @@ vcd003
 - hosts: vcd
   gather_facts: false
   collections:
-    - dholzer.vmware_vcd
+    - dgsponer.vmware_vcd
 
   roles:
     - config_cmt_manage-config
@@ -91,7 +94,7 @@ vcd003
 # var vcd
 ```
 vcd:
-  api_version: 37.1
+  api_version: 38.0
   license: '00000-00000-00000-00000-00000'
 
   java_opts:
@@ -493,6 +496,37 @@ vcd:
       storage:
         - vmw_vsphere
         - vmw_vsphere_bkp
+
+  vm_placement_policies:
+    - name: wss-az1
+      description: 'SingleSite AZ1'
+      pvdc: vce-01-001
+      vmgroups:
+        - grp-vm-wss-az1
+
+    - name: wss-az2
+      description: 'SingleSite AZ2'
+      pvdc: vce-01-001
+      vmgroups:
+        - grp-vm-wss-az2
+
+    - name: wss-az3
+      description: 'SingleSite AZ3'
+      pvdc: vce-01-001
+      vmgroups:
+        - grp-vm-wss-az3
+
+    - name: wms-az1
+      description: 'MultiSite preferred AZ1'
+      pvdc: vce-01-001
+      vmgroups:
+        - grp-vm-wms-az1
+
+    - name: wms-az2
+      description: 'MultiSite preferred AZ2'
+      pvdc: vce-01-001
+      vmgroups:
+        - grp-vm-wms-az2
 ```
 
 # var components
