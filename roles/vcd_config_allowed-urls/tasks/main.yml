@@ -1,0 +1,37 @@
+---
+# tasks file for vcd_config_allowed-urls
+- name: Get allowed_urls from "{{ inventory_hostname }}"
+  uri:
+    validate_certs: false
+    url: https://{{ inventory_hostname }}/cloudapi/1.0.0/site/settings/cors
+    status_code: [200]
+    method: GET
+    headers:
+      Accept: application/json;version={{ vcd.api_version }}
+      Authorization: Bearer {{ vcd_session.x_vmware_vcloud_access_token }}
+  register: vcdcors
+  delegate_to: '{{ vcd.api_host }}'
+
+- set_fact:
+    cors: "{{ cors | default([]) + [{'origin':item}] }}"
+  loop: 
+     "{{ vcdcors.json | json_query('values[*].origin') }}"
+
+
+- name: Loop allowed_urls
+  include_tasks: add_url.yml
+  loop: "{{ vcd.allowed_urls }}"
+
+- name: Set allowed_urls to "{{ inventory_hostname }}"
+  uri:
+    validate_certs: false
+    url: https://{{ inventory_hostname }}/cloudapi/1.0.0/site/settings/cors
+    status_code: [200]
+    method: PUT
+    headers:
+      Accept: application/json;version={{ vcd.api_version }}
+      Authorization: Bearer {{ vcd_session.x_vmware_vcloud_access_token }}
+    body_format: json
+    body:
+      values: "{{ cors }}"
+  delegate_to: '{{ vcd.api_host }}'

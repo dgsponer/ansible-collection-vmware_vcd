@@ -1,0 +1,218 @@
+---
+# tasks file for vcd_monitoring-vami
+- name: Ping "{{ inventory_hostname }}"
+  ping:
+  register: reachable
+
+- name: Get /services from "{{ inventory_hostname }}"
+  uri:
+    validate_certs: false
+    url: https://{{ inventory_hostname }}:5480/api/1.0.0/services
+    status_code: [200]
+    method: GET
+    headers:
+      Accept: application/json #;version={{ vcd.api_version }}
+      #Authorization: Bearer {{ vcd_session.x_vmware_vcloud_access_token }}
+    user: root
+    password: VMwareVCD1.
+    force_basic_auth: true
+  register: services
+  delegate_to: '{{ vcd.api_host }}'
+
+- name: Get /backups from "{{ inventory_hostname }}"
+  uri:
+    validate_certs: false
+    url: https://{{ inventory_hostname }}:5480/api/1.0.0/backups
+    status_code: [200]
+    method: GET
+    headers:
+      Accept: application/json #;version={{ vcd.api_version }}
+      #Authorization: Bearer {{ vcd_session.x_vmware_vcloud_access_token }}
+    user: root
+    password: VMwareVCD1.
+    force_basic_auth: true
+  register: backups
+  delegate_to: '{{ vcd.api_host }}'
+
+- name: Get /isPrimary from "{{ inventory_hostname }}"
+  uri:
+    validate_certs: false
+    url: https://{{ inventory_hostname }}:5480/api/1.0.0/isPrimary
+    status_code: [200]
+    method: GET
+    headers:
+      Accept: application/json #;version={{ vcd.api_version }}
+      #Authorization: Bearer {{ vcd_session.x_vmware_vcloud_access_token }}
+    user: root
+    password: VMwareVCD1.
+    force_basic_auth: true
+  register: isPrimary
+  delegate_to: '{{ vcd.api_host }}'
+
+- name: Get /mount from "{{ inventory_hostname }}"
+  uri:
+    validate_certs: false
+    url: https://{{ inventory_hostname }}:5480/api/1.0.0/mount
+    status_code: [200]
+    method: GET
+    headers:
+      Accept: application/json #;version={{ vcd.api_version }}
+      #Authorization: Bearer {{ vcd_session.x_vmware_vcloud_access_token }}
+    user: root
+    password: VMwareVCD1.
+    force_basic_auth: true
+  register: mount
+  delegate_to: '{{ vcd.api_host }}'
+
+- name: Get /storage from "{{ inventory_hostname }}"
+  uri:
+    validate_certs: false
+    url: https://{{ inventory_hostname }}:5480/api/1.0.0/storage
+    status_code: [200]
+    method: GET
+    headers:
+      Accept: application/json #;version={{ vcd.api_version }}
+      #Authorization: Bearer {{ vcd_session.x_vmware_vcloud_access_token }}
+    user: root
+    password: VMwareVCD1.
+    force_basic_auth: true
+  register: storage
+  delegate_to: '{{ vcd.api_host }}'
+
+- name: Get /tasks from "{{ inventory_hostname }}"
+  uri:
+    validate_certs: false
+    url: https://{{ inventory_hostname }}:5480/api/1.0.0/tasks
+    status_code: [200]
+    method: GET
+    headers:
+      Accept: application/json #;version={{ vcd.api_version }}
+      #Authorization: Bearer {{ vcd_session.x_vmware_vcloud_access_token }}
+    user: root
+    password: VMwareVCD1.
+    force_basic_auth: true
+  register: tasks
+  delegate_to: '{{ vcd.api_host }}'
+
+- name: Get /version from "{{ inventory_hostname }}"
+  uri:
+    validate_certs: false
+    url: https://{{ inventory_hostname }}:5480/api/1.0.0/version
+    status_code: [200]
+    method: GET
+    headers:
+      Accept: application/json #;version={{ vcd.api_version }}
+      #Authorization: Bearer {{ vcd_session.x_vmware_vcloud_access_token }}
+    user: root
+    password: VMwareVCD1.
+    force_basic_auth: true
+  register: version
+  delegate_to: '{{ vcd.api_host }}'
+
+- name: Get /nodes from "{{ inventory_hostname }}"
+  uri:
+    validate_certs: false
+    url: https://{{ inventory_hostname }}:5480/api/1.0.0/nodes
+    status_code: [200]
+    method: GET
+    headers:
+      Accept: application/json #;version={{ vcd.api_version }}
+      #Authorization: Bearer {{ vcd_session.x_vmware_vcloud_access_token }}
+    user: root
+    password: VMwareVCD1.
+    force_basic_auth: true
+  register: nodes
+  delegate_to: '{{ vcd.api_host }}'
+
+- set_fact:
+    node: "{{ nodes | json_query('json.localClusterState[?name==`' + (inventory_hostname | split('.')).0 + '`].{ \
+            id:id, \
+            location:location, \
+            name:name, \
+            nodeHealth:nodeHealth, \
+            nodeRole:nodeRole, \
+            role:role, \
+            status:status, \
+            failover:failover, \
+            upstream:upstream \
+          }') }}"
+
+- debug:
+    var: item
+  loop:
+      - "{{ reachable.failed }}"
+      - "{{ services.json }}"
+      - "{{ backups.json }}"
+      - "{{ isPrimary.json }}"
+      - "{{ mount.json }}"
+      - "{{ storage.json }}"
+      - "{{ tasks.json }}"
+      - "{{ version.json.appliance }}"
+      - "{{ nodes.json }}"
+      - "{{ node }}"
+
+- debug:
+    var: services #| json_query('json.values[?serviceName==`vmware-vcd`].status')
+- debug:
+    var: services | json_query('json[?serviceName==`vmware-vcd`].status')
+
+- name: set fact
+  set_fact:
+    service_vmware_vcd: "{{ (services | json_query('json[?serviceName==`vmware-vcd`].status')).0 }}"
+    service_appliance_sync_timer: "{{ (services | json_query('json[?serviceName==`appliance-sync.timer`].status')).0 }}"
+    service_v_postgres: "{{ (services | json_query('json[?serviceName==`vpostgres`].status')).0 }}"
+    service_repmgrd: "{{ (services | json_query('json[?serviceName==`repmgrd`].status')).0 }}"
+    status: "{{ (node[0].status) | replace('* ','') }}"
+
+- name: create payload variable
+  set_fact:
+    vcd_health_payload: '{ "vcdPod": "{{ vcd.monitoring.vcdPod }}",
+      "vcdVamiServer": "{{ inventory_hostname }}",
+      "reachable": "{{ reachable.failed }}",
+      "version": "{{ version.json.appliance }}",
+      "nodeHealth": "{{ node[0].nodeHealth }}",
+      "vcdRole": "{{ node[0].nodeRole }}",
+      "postgresRole": "{{ node[0].role }}",
+      "postgresNodeId": "{{ node[0].id }}",
+      "postgresFailoverMode": "{{ node[0].failover.mode }}", 
+      "postgresUpstream": "{{ node[0].upstream }}", 
+      "status": "{{ status }}",
+      "isPrimary": "{{ isPrimary.json.isPrimary }}", 
+      "backups": "{{ backups.json.resultTotal }}",
+      "storageNfsPercentUsed": "{{ storage.json.nfs.percentUsed }}",
+      "storageRootPercentUsed": "{{ storage.json.root.percentUsed }}",
+      "storagePostgresPercentUsed": "{{ storage.json.postgres.percentUsed }}",
+      "servicesVmwareVcd": "{{ service_vmware_vcd }}", 
+      "servicesApplianceSyncTimer": "{{ service_appliance_sync_timer }}", 
+      "servicesVpostgres": "{{ service_v_postgres }}", 
+      "servicesRepmgrd": "{{ service_repmgrd }}", 
+      "tasks": "{{ tasks.json.resultTotal }}",
+      "timestamp": "{{ ansible_date_time.iso8601 }}" }'
+
+# - name: create payload variable
+#   set_fact:
+#     vcd_health_payload: '{ "vcdPod": "{{ vcd.monitoring.vcdPod }}",
+#       "vcdVamiServer": "{{ inventory_hostname }}",
+#       "reachable": "{{ reachable.failed }}",
+#       "version": "{{ version.json.appliance }}",
+#       "nodeHealth": "{{ node[0].nodeHealth }}",
+#       "vcdRole": "{{ node[0].nodeRole }}", 
+#       "postgresRole": "{{ node[0].role }}", 
+#       "postgresNodeId": "{{ node[0].id }}", 
+#       "postgresFailoverMode": "{{ node[0].failover.mode }}", 
+#       "postgresUpstream": "{{ node[0].upstream }}", 
+#       "status": "{{ node[0].status }}", 
+#       "isPrimary": "{{ isPrimary }}", 
+#       "backups": "{{ node[0].failover.mode }}", 
+#       "storageNfsPercentUsed": "", 
+#       "storageRootPercentUsed": "", 
+#       "storagePostgresPercentUsed": "", 
+#       "servicesVmwareVcd": "", 
+#       "servicesApplianceSyncTimer": "", 
+#       "servicesVpostgres": "", 
+#       "servicesRepmgrd": "", 
+#       "tasks": "" }' #, 
+#       # "timestamp": "{{ ansible_date_time.iso8601 }}" }'
+
+- debug:
+    var: vcd_health_payload

@@ -1,0 +1,28 @@
+---
+# tasks file for vcd_config_allowed-urls
+- set_fact: 
+    ip_address: "{{ lookup('dig', item) | ansible.utils.ipaddr | default(omit, true) }}"
+
+- set_fact:
+    cors: "{{ cors + [{'origin':ip_address}] }}"
+  when: ip_address not in cors | map(attribute="origin")
+
+- set_fact:
+    cors: "{{ cors + [{'origin':'http://' + ip_address}] }}"
+  when: ('http://'+ip_address not in cors | map(attribute="origin"))
+
+- set_fact:
+    cors: "{{ cors + [{'origin':'https://' + ip_address}] }}"
+  when: ('https://'+ip_address not in cors | map(attribute="origin"))
+
+- set_fact:
+    cors: "{{ cors + [{'origin':item}] }}"
+  when: item not in cors | map(attribute="origin")
+
+- set_fact:
+    cors: "{{ cors + [{'origin':'http://' + item}] }}"
+  when: ('http://'+item not in cors | map(attribute="origin"))
+
+- set_fact:
+    cors: "{{ cors + [{'origin':'https://' + item}] }}"
+  when: ('https://'+item not in cors | map(attribute="origin"))
