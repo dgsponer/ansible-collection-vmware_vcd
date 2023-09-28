@@ -1,9 +1,9 @@
 ---
 # tasks file for config_ir_vce
-- name: Register vCenter "{{ item.0.hostname }}""
+- name: Register vCenter "{{ item[0].hostname }}""
   uri:
     validate_certs: false
-    url: https://{{ vcd.cell.primary.0.system_name }}/cloudapi/1.0.0/virtualCenters
+    url: https://{{ inventory_hostname }}/cloudapi/1.0.0/virtualCenters
     status_code: [202, 400]
     method: POST
     headers:
@@ -12,14 +12,15 @@
       Authorization: Bearer {{ vcd_session.x_vmware_vcloud_access_token }}
     body_format: json
     body:
-      description: "{{ item.0.hostname }}"
-      name: "{{ item.0.hostname }}"
-      url: "https://{{ item.0.hostname }}"
-      username: "{{ item.0.username }}"
-      password: "{{ item.0.password }}"
+      description: "{{ item[0].hostname }}"
+      name: "{{ item[0].hostname }}"
+      url: "https://{{ item[0].hostname }}"
+      username: "{{ item[0].username }}"
+      password: "{{ item[0].password }}"
       isConnected: true
       isEnabled: true
   register: result
+  delegate_to: '{{ vcd.api_host }}'
 
 #- name: Fail if status code 400 and vCenter is not added
 #  fail:
