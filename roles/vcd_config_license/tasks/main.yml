@@ -1,0 +1,29 @@
+---
+# tasks file for config_license
+- name: Read licenses from "{{ inventory_hostname }}"
+  uri:
+    validate_certs: false
+    url: https://{{ inventory_hostname }}/api/admin/extension/settings/license
+    status_code: [200, 400]
+    method: GET
+    headers:
+      Accept: application/vnd.vmware.admin.licenseSettings+json;version={{ vcd.api_version }}
+      Authorization: Bearer {{ vcd_session.x_vmware_vcloud_access_token }}
+  register: license
+  delegate_to: '{{ vcd.api_host }}'
+
+- name: Set licenses to "{{ inventory_hostname }}"
+  uri:
+    validate_certs: false
+    url: https://{{ inventory_hostname }}/api/admin/extension/settings/license
+    status_code: [200, 400]
+    method: PUT
+    headers:
+      Content-Type: application/vnd.vmware.admin.licenseSettings+json
+      Accept: application/vnd.vmware.admin.licenseSettings+json;version={{ vcd.api_version }}
+      Authorization: Bearer {{ vcd_session.x_vmware_vcloud_access_token }}
+    body_format: json
+    body:
+      serialNumber: "{{ vcd.license }}"
+  when: 'vcd.license != license.json.serialNumber'
+  delegate_to: '{{ vcd.api_host }}'

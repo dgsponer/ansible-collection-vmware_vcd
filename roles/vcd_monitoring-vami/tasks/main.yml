@@ -1,8 +1,14 @@
 ---
 # tasks file for vcd_monitoring-vami
+- name: Get timestamp from the system
+  shell: "date +%Y-%m-%d%H-%M-%S"
+  register: tstamp
+  delegate_to: '{{ vcd.api_host }}'
+
 - name: Ping "{{ inventory_hostname }}"
   ping:
   register: reachable
+  delegate_to: '{{ vcd.deployment.host }}'
 
 - name: Get /services from "{{ inventory_hostname }}"
   uri:
@@ -137,24 +143,24 @@
             upstream:upstream \
           }') }}"
 
-- debug:
-    var: item
-  loop:
-      - "{{ reachable.failed }}"
-      - "{{ services.json }}"
-      - "{{ backups.json }}"
-      - "{{ isPrimary.json }}"
-      - "{{ mount.json }}"
-      - "{{ storage.json }}"
-      - "{{ tasks.json }}"
-      - "{{ version.json.appliance }}"
-      - "{{ nodes.json }}"
-      - "{{ node }}"
+# - debug:
+#     var: item
+#   loop:
+#       - "{{ reachable.failed }}"
+#       - "{{ services.json }}"
+#       - "{{ backups.json }}"
+#       - "{{ isPrimary.json }}"
+#       - "{{ mount.json }}"
+#       - "{{ storage.json }}"
+#       - "{{ tasks.json }}"
+#       - "{{ version.json.appliance }}"
+#       - "{{ nodes.json }}"
+#       - "{{ node }}"
 
-- debug:
-    var: services #| json_query('json.values[?serviceName==`vmware-vcd`].status')
-- debug:
-    var: services | json_query('json[?serviceName==`vmware-vcd`].status')
+# - debug:
+#     var: services #| json_query('json.values[?serviceName==`vmware-vcd`].status')
+# - debug:
+#     var: services | json_query('json[?serviceName==`vmware-vcd`].status')
 
 - name: set fact
   set_fact:
@@ -187,32 +193,7 @@
       "servicesVpostgres": "{{ service_v_postgres }}", 
       "servicesRepmgrd": "{{ service_repmgrd }}", 
       "tasks": "{{ tasks.json.resultTotal }}",
-      "timestamp": "{{ ansible_date_time.iso8601 }}" }'
-
-# - name: create payload variable
-#   set_fact:
-#     vcd_health_payload: '{ "vcdPod": "{{ vcd.monitoring.vcdPod }}",
-#       "vcdVamiServer": "{{ inventory_hostname }}",
-#       "reachable": "{{ reachable.failed }}",
-#       "version": "{{ version.json.appliance }}",
-#       "nodeHealth": "{{ node[0].nodeHealth }}",
-#       "vcdRole": "{{ node[0].nodeRole }}", 
-#       "postgresRole": "{{ node[0].role }}", 
-#       "postgresNodeId": "{{ node[0].id }}", 
-#       "postgresFailoverMode": "{{ node[0].failover.mode }}", 
-#       "postgresUpstream": "{{ node[0].upstream }}", 
-#       "status": "{{ node[0].status }}", 
-#       "isPrimary": "{{ isPrimary }}", 
-#       "backups": "{{ node[0].failover.mode }}", 
-#       "storageNfsPercentUsed": "", 
-#       "storageRootPercentUsed": "", 
-#       "storagePostgresPercentUsed": "", 
-#       "servicesVmwareVcd": "", 
-#       "servicesApplianceSyncTimer": "", 
-#       "servicesVpostgres": "", 
-#       "servicesRepmgrd": "", 
-#       "tasks": "" }' #, 
-#       # "timestamp": "{{ ansible_date_time.iso8601 }}" }'
+      "timestamp": "{{ tstamp }}" }'
 
 - debug:
     var: vcd_health_payload

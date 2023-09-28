@@ -1,0 +1,15 @@
+---
+# tasks file for vcd_api_session
+- name: Connect to "{{ inventory_hostname }}" and get a token
+  uri:
+    url: https://{{ inventory_hostname }}/cloudapi/1.0.0/sessions/provider
+    method: POST
+    status_code: 200
+    validate_certs: no
+    headers:
+      Accept: application/*;version={{ vcd.api_version }}
+    user: "{{ vcd.username }}@system"
+    password: "{{ vcd.password }}"
+    force_basic_auth: yes
+  register: vcd_session
+  delegate_to: "{{ vcd.api_host }}"

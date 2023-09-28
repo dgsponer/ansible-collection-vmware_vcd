@@ -1,0 +1,26 @@
+---
+# tasks file for config_global-roles
+- name: Read right "{{ item }}" from "{{ inventory_hostname }}"
+  uri:
+    validate_certs: false
+    url: https://{{ inventory_hostname }}/cloudapi/1.0.0/rights?filter=name=={{ item | urlencode }}
+    status_code: [200, 400]
+    method: GET
+    headers:
+      Accept: application/json;version={{ vcd.api_version }}
+      Authorization: Bearer {{ vcd_session.x_vmware_vcloud_access_token }}
+  register: result
+  ignore_errors: true
+  delegate_to: '{{ vcd.api_host }}'
+
+- debug:
+    msg: "Right not found: {{ item }}" 
+  when: 'result.json.resultTotal == 0'
+
+- debug:
+    msg: "Multiple Rights found: {{ result.json }}" 
+  when: 'result.json.resultTotal > 1'
+
+- set_fact:
+    rights: "{{ rights + result.json | json_query('values[*].{name: name, id: id}') }}"
+  when: 'result.json.resultTotal == 1'
