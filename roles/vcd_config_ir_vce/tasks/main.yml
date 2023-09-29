@@ -2,4 +2,4 @@
 # tasks file for config_ir_vce
 - include_tasks: vce.yml
   loop:
-    - "{{ vce }}"
+    "{{ vce }}"

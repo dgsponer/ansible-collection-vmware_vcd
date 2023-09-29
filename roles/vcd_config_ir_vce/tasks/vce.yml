@@ -1,28 +1,46 @@
 ---
 # tasks file for config_ir_vce
-- name: Register vCenter "{{ item[0].hostname }}""
+- name: Get vCenter
   uri:
-    validate_certs: false
     url: https://{{ inventory_hostname }}/cloudapi/1.0.0/virtualCenters
-    status_code: [202, 400]
-    method: POST
+    method: GET
+    status_code: 200
+    validate_certs: no
+    headers:
+      Content-Type: application/json
+      Accept: application/json;version={{ vcd.api_version }}
+      Authorization: Bearer {{ vcd_session.x_vmware_vcloud_access_token }}
+  register: vcenter
+  delegate_to: '{{ vcd.api_host }}'
+
+# - name: Add default parameters
+#   set_fact:
+#     payload: "{{ item | combine({ 'resource_type': 'IpAddressPool'}) }}"
+
+- name: Exist, Update - add _revision parameter
+  set_fact:
+    method: 'PUT'
+    vcid: "{{ (vcenter.json | json_query('values[?url==`' + ('https://' + item.hostname) + '`].vcId'))[0] }}"
+    #status_code: 202
+  when: ('https://' + item.hostname) in (vcenter.json | json_query('values[*].url'))
+
+- name: Register vCenter "{{ item.hostname }}"
+  uri:
+    url: https://{{ inventory_hostname }}/cloudapi/1.0.0/virtualCenters/{{ vcid | default('') }}
+    method: "{{ method | default('POST') }}"
+    status_code: "{{ status_code | default('202') }}"
+    validate_certs: no
     headers:
       Content-Type: application/json
       Accept: application/json;version={{ vcd.api_version }}
       Authorization: Bearer {{ vcd_session.x_vmware_vcloud_access_token }}
     body_format: json
     body:
-      description: "{{ item[0].hostname }}"
-      name: "{{ item[0].hostname }}"
-      url: "https://{{ item[0].hostname }}"
-      username: "{{ item[0].username }}"
-      password: "{{ item[0].password }}"
+      name: "{{ item.hostname }}"
+      description: "{{ item.description | default(omit) }}"
+      url: "https://{{ item.hostname }}"
+      username: "{{ item.username }}"
+      password: "{{ item.password }}"
       isConnected: true
       isEnabled: true
-  register: result
   delegate_to: '{{ vcd.api_host }}'
-
-#- name: Fail if status code 400 and vCenter is not added
-#  fail:
-#    msg: "Can't add vCenter: {{ result }}"
-#  when: result.status == 400 and 'Another vCenter found with url' not in result.json.message
