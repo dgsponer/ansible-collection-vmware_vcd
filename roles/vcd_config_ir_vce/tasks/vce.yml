@@ -17,13 +17,15 @@
 #   set_fact:
 #     payload: "{{ item | combine({ 'resource_type': 'IpAddressPool'}) }}"
 
-- name: Exist, Update - add _revision parameter
+- name: Exist, Update
   set_fact:
     method: 'PUT'
     vcid: "{{ (vcenter.json | json_query('values[?url==`' + ('https://' + item.hostname) + '`].vcId'))[0] }}"
     #status_code: 202
   when: ('https://' + item.hostname) in (vcenter.json | json_query('values[*].url'))
 
+# POST https://developer.vmware.com/apis/vmware-cloud-director/latest/cloudapi/1.0.0/virtualCenters/post/
+# PUT  https://developer.vmware.com/apis/vmware-cloud-director/latest/cloudapi/1.0.0/virtualCenters/vcUrn/put/
 - name: Register vCenter "{{ item.hostname }}"
   uri:
     url: https://{{ inventory_hostname }}/cloudapi/1.0.0/virtualCenters/{{ vcid | default('') }}
@@ -41,6 +43,6 @@
       url: "https://{{ item.hostname }}"
       username: "{{ item.username }}"
       password: "{{ item.password }}"
-      isConnected: true
+      #isConnected: true
       isEnabled: true
   delegate_to: '{{ vcd.api_host }}'

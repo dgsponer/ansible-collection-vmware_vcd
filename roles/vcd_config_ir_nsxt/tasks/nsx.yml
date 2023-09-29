@@ -17,13 +17,14 @@
 #   set_fact:
 #     payload: "{{ item | combine({ 'resource_type': 'IpAddressPool'}) }}"
 
-- name: Exist, Update - add _revision parameter
+- name: Exist, Update
   set_fact:
     method: 'PUT'
     id: "{{ (nsxt.json | json_query('nsxTManager[?url==`' + ('https://' + item.hostname) + '`].id'))[0] | replace('urn:vcloud:nsxtmanager:','') }}"
     #status_code: 200
   when: ('https://' + item.hostname) in (nsxt.json | json_query('nsxTManager[*].url'))
 
+# https://developer.vmware.com/apis/1703/doc////types/NsxTManagerType.html
 - name: Register NSX-T "{{ item.hostname }}"
   uri:
     url: https://{{ inventory_hostname }}/api/admin/extension/nsxtManagers/{{ id | default('') }}
