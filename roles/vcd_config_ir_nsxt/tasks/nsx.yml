@@ -39,6 +39,8 @@
       name: "{{ item.hostname }}"
       description: "{{ item.description | default(omit) }}"
       url: "https://{{ item.hostname }}"
+      globalmanager: "{{ item.globalmanager | default(omit) }}"
+      networkproviderscope: "{{ item.networkproviderscope | default(omit) }}"
       username: "{{ item.username }}"
       password: "{{ item.password }}"
   delegate_to: '{{ vcd.api_host }}'
