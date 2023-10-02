@@ -1,5 +1,4 @@
 ---
 # tasks file for config_ir_nsxt
 - include_tasks: nsx.yml
-  loop:
-    "{{ nsx }}"
+  loop: "{{ nsx }}"

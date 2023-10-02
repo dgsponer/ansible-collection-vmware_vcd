@@ -1,6 +1,7 @@
 ---
 # tasks file for config_import_certificates
 - include_tasks: import_certificates.yml
-  loop:
-    - "{{ vce }}"
-    - "{{ nsx }}"
+  loop: "{{ vce }}"
+
+- include_tasks: import_certificates.yml
+  loop: "{{ nsx }}"

@@ -3,7 +3,7 @@
 - name: nsxtManagers
   uri:
     validate_certs: false
-    url: https://{{ vcd.cell.primary.0.system_name }}/api/admin/extension/nsxtManagers
+    url: https://{{ inventory_hostname }}/api/admin/extension/nsxtManagers
     status_code: [200, 400]
     method: GET
     headers:
@@ -13,4 +13,6 @@
 
 - include_tasks: network_pools.yml
   loop:
-    - "{{ nsxtManagers.json.nsxTManager }}"
+    "{{ nsxtManagers.json.nsxTManager }}"
+  loop_control:
+    loop_var: nsxTManager
