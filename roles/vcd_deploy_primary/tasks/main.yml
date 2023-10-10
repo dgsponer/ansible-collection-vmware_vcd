@@ -12,7 +12,6 @@
     - not eth0_ip
     - not eth1_ip
 
-
 # https://docs.vmware.com/en/VMware-Cloud-Director/10.4/VMware-Cloud-Director-Install-Configure-Upgrade-Guide/GUID-2B34775B-7C96-44F2-A9A3-D6A9D3B0CAD2.html
 - name: Deploy "{{ inventory_hostname }}"
   command: 

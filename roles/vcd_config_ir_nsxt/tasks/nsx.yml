@@ -13,10 +13,6 @@
   register: nsxt
   delegate_to: '{{ vcd.api_host }}'
 
-# - name: Add default parameters
-#   set_fact:
-#     payload: "{{ item | combine({ 'resource_type': 'IpAddressPool'}) }}"
-
 - name: Exist, Update
   set_fact:
     method: 'PUT'

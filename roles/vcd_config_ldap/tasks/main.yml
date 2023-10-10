@@ -1,0 +1,63 @@
+---
+# tasks file for vcd_config_ldap
+- name: Get ldap from "{{ inventory_hostname }}"
+  uri:
+    validate_certs: false
+    url: https://{{ inventory_hostname }}/api/admin/extension/settings/ldapSettings
+    status_code: [200]
+    method: GET
+    headers:
+      Accept: application/vnd.vmware.admin.ldapSettings+json;version={{ vcd.api_version }}
+      Authorization: Bearer {{ vcd_session.x_vmware_vcloud_access_token }}
+  register: ldap
+  delegate_to: '{{ vcd.api_host }}'
+
+- debug:
+    var: ldap.json
+    verbosity: 1
+
+- name: Create or Update ldap "{{ vcd.ldap.hostname }}"
+  uri:
+    validate_certs: false
+    url: https://{{ inventory_hostname }}/api/admin/extension/settings/ldapSettings
+    method: PUT
+    status_code: [200]
+    headers:
+      Accept: application/vnd.vmware.admin.ldapSettings+json;version={{ vcd.api_version }}
+      Authorization: Bearer {{ vcd_session.x_vmware_vcloud_access_token }}
+      Content-Type: application/vnd.vmware.admin.ldapSettings+json
+    body_format: json
+    body:
+      authenticationMechanism: "{{ vcd.ldap.authentication_mechanism }}"
+      connectorType: "{{ vcd.ldap.connector_type }}"
+      hostName: "{{ vcd.ldap.hostname }}"
+      groupAttributes:
+        backLinkIdentifier: "objectSid"
+        groupName: "cn"
+        membership: "member"
+        membershipIdentifier: "dn"
+        objectClass: "group"
+        objectIdentifier: "objectGuid"
+      hostName: "{{ vcd.ldap.hostname }}" 
+      isGroupSearchBaseEnabled: "{{ vcd.ldap.search_base_enabled }}"
+      isSsl: "{{ vcd.ldap.ssl }}"
+      pagedSearchDisabled: "{{ vcd.ldap.page_search_disabled }}"
+      pageSize: 200
+      maxResults: 200
+      maxUserGroups: 1015
+      password: "{{ vcd.ldap.password }}"
+      port: "{{ vcd.ldap.port | int }}"
+      searchBase: "{{ vcd.ldap.search_base }}"
+      userAttributes:
+        email: "mail"
+        fullName: "displayName"
+        givenName: "givenName"
+        groupBackLinkIdentifier: "tokenGroups"
+        groupMembershipIdentifier: "dn"
+        objectClass: "user"
+        objectIdentifier: "objectGuid"
+        surname: "sn"
+        telephone: "telephoneNumber"
+        userName: "sAMAccountName"
+      userName: "{{ vcd.ldap.username }}"
+  delegate_to: '{{ vcd.api_host }}'

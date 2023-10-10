@@ -1,5 +1,5 @@
 ---
-# tasks file for config_ir_vce
+# tasks file for vcd_config_import_certificates
 - name: Get certificate from "{{ item.hostname }}"
   get_certificate:
     host: "{{ item.hostname }}"
