@@ -9,7 +9,7 @@
     api_version: "{{ vcd.api_version }}"
     verify_ssl_certs: False
     provider_vdc_name: "{{ item.name }}"
-    description: "{{ item.description }}"
+    description: "{{ item.description | default(omit) }}"
     storage_profiles: "{{ item.storage }}"
     vcenter_name: "{{ vce[0].hostname }}"
     resource_pool_cluster_name: "{{ item.clustername }}"

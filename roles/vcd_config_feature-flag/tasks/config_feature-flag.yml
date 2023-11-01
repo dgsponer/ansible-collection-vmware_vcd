@@ -1,0 +1,16 @@
+---
+# tasks file for vcd_config_feature-flag
+- name: Set feature flag "{{ item.name }}" to "{{ item.enabled }}"
+  uri:
+    validate_certs: false
+    url: https://{{ inventory_hostname }}/cloudapi/1.0.0/featureFlags/{{ (vcd_feature_flags.json | json_query('values[?name==`' + item.name + '`].id'))[0] }}
+    status_code: [200]
+    method: PUT
+    headers:
+      Accept: application/json;version={{ vcd.api_version }}
+      Authorization: Bearer {{ vcd_session.x_vmware_vcloud_access_token }}
+    body_format: json
+    body:
+      enabled: '{{ item.enabled }}'
+  delegate_to: '{{ vcd.api_host }}'
+  when: item.enabled != (vcd_feature_flags.json | json_query('values[?name==`' + item.name + '`].enabled'))[0]
