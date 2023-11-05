@@ -34,61 +34,91 @@ lab01-vcd-03.vcloud24.net
 ```
 ---
 # Day1 - Deployment
-- hosts: localhost
-  gather_facts: false
+# Primary
+- hosts: vmw_vcd_db_primary
+  vars:
+    vcd_deployment_size: primary-small
   collections:
     - dgsponer.vmware_vcd
 
   roles:
-    - deploy_primary
-    - deploy_nonprimary
+    - vcd_deploy_primary
+
+# Standby
+- hosts: vmw_vcd_db:!vmw_vcd_db_primary
+  vars:
+    vcd_deployment_size: standby-small
+  collections:
+    - dgsponer.vmware_vcd
+
+  roles:
+    - vcd_deploy_primary
+
+# Cell
+- hosts: vmw_vcd_cell
+  vars:
+    vcd_deployment_size: cell
+  collections:
+    - dgsponer.vmware_vcd
+
+  roles:
+    - vcd_deploy_primary
 
 
-
-# Day2 - DB-nodes
-- hosts: vcd-db
-  gather_facts: false
+# Day2 - Configure DB-Nodes
+- hosts: vmw_vcd_db
   collections:
     - dgsponer.vmware_vcd
  
   roles:   
-    - config_db_backup
- 
- 
+    - vcd_config_db_backup
+  
+  vars:
+    ansible_ssh_user: root
+    ansible_ssh_pass: "{{ vcd_root_password }}"
 
-# Day2 - VCD settings with API
-- hosts: localhost
-  gather_facts: false
+  
+# Day2 - VCD settings 
+- hosts: vmw_vcd[0]
   collections:
     - dgsponer.vmware_vcd
  
   roles:
-    - api_session   
-    - config_import_certificates
-    - config_ir_vce
-    - config_ir_nsxt
-    - config_cr_network-pools
-    - config_license
-    - config_global-roles
-    - config_placement-policy
-    - config_pvdcs
+    - vcd_api_session
+    - vcd_config_feature-flag 
+    - vcd_config_import_certificates
+    - vcd_config_license
+    - vcd_config_global-roles
+    - vcd_config_cmt_manage-config
+    - vcd_config_allowed-urls
+    - vcd_config_ir_vce
+    - vcd_config_ir_nsxt
+    - vcd_config_pvdcs
+    - vcd_config_placement-policy
+    - vcd_config_cr_network-pools
+
+  vars:
+    ansible_ssh_user: root
+    ansible_ssh_pass: "{{ vcd_root_password }}"
 
 
-
-# Day2 - VCD settings with SSH
-- hosts: vcd
-  gather_facts: false
+# Day2 - VCD settings 
+- hosts: vmw_vcd
   collections:
     - dgsponer.vmware_vcd
-
+ 
   roles:
-    - config_cmt_manage-config
-    - config_cipher
-    - config_proxy
-    - config_syslog
-    - config_trust-infra-certs
-    - config_global-properties
-    - config_java
+    - vcd_config_syslog
+    - vcd_monitoring-vami
+    - vcd_config_global-properties
+    - vcd_config_trust-infra-certs
+    - vcd_config_cipher
+    - vcd_config_proxy
+    - vcd_config_java
+
+  vars:
+    ansible_ssh_user: root
+    ansible_ssh_pass: "{{ vcd_root_password }}"
 ```
 
 # var vcd
@@ -96,6 +126,10 @@ lab01-vcd-03.vcloud24.net
 vcd:
   api_version: 38.0
   license: '00000-00000-00000-00000-00000'
+
+  allowed_urls:
+    - "vcd.vcloud24.net"
+    - "api-vcd.vcloud24.net"
 
   java_opts:
     xms: 2048
@@ -115,12 +149,14 @@ vcd:
     - TLS_RSA_WITH_AES_128_CBC_SHA
 
   deployment:
+    host: localhost
+    chdir: /root/repository
+    ova: 'VMware_Cloud_Director-10.5.0.9946-22080476_OVF10.ova'
+
     vce:
       hostname: 'base01-vce-01.vcloud24.net'
       username: 'administrator@vsphere.local'
       password: 'VMwareVCE1.'
-
-    ova: 'VMware_Cloud_Director-10.4.1.9057-20912720_OVF10.ova'
 
     datacenter: 'base01'
     folder: '/vcd01'
@@ -129,7 +165,7 @@ vcd:
     cluster: 'base01/Resources/vcd01'
 
     disk_provisioning: 'thin'
-    datastore: 'qnap-ts879 vmw_vsphere'
+    datastore: 'ds-base01-nfs-01_vmw-vsphere_bkp'
 
     eth0:
       network: 'base01-0101mgmt'
@@ -159,54 +195,6 @@ vcd:
       fullname: 'vCD Admin'
   password: 'VMwareVCD1.'
   username: 'administrator'
-
-  cell:
-    primary:
-      - size: 'primary-extralarge'
-        vm_name: 'psrv01vcd001.vcloud24.net'
-        system_name: 'psrv01vcd001.vcloud24.net'
-        root_password: 'VMwareVCD1.'
-        eth0:
-          ip: 172.16.0.26
-        eth1:
-          ip: 10.10.10.1
-
-    nonprimary:
-      - size: 'standby-extralarge'
-        vm_name: 'psrv01vcd002.vcloud24.net'
-        system_name: 'psrv01vcd002.vcloud24.net'
-        root_password: 'VMwareVCD1.'
-        eth0:
-          ip: 172.16.0.27
-        eth1:
-          ip: 10.10.10.2
-
-      - size: 'standby-extralarge'
-        vm_name: 'psrv01vcd003.vcloud24.net'
-        system_name: 'psrv01vcd003.vcloud24.net'
-        root_password: 'VMwareVCD1.'
-        eth0:
-          ip: 172.16.0.28
-        eth1:
-          ip: 10.10.10.3
-
-      - size: 'cell'
-        vm_name: 'psrv01vcd004.vcloud24.net'
-        system_name: 'psrv01vcd004.vcloud24.net'
-        root_password: 'VMwareVCD1.'
-        eth0:
-          ip: 172.16.0.29
-        eth1:
-          ip: 10.10.10.4
-
-      - size: 'cell'
-        vm_name: 'psrv01vcd005.vcloud24.net'
-        system_name: 'psrv01vcd005.vcloud24.net'
-        root_password: 'VMwareVCD1.'
-        eth0:
-          ip: 172.16.0.30
-        eth1:
-          ip: 10.10.10.5
 
   # CMT Advanced Parameter
   advanced_settings:
@@ -310,8 +298,6 @@ vcd:
         - 'Catalog: View Private and Shared Catalogs'
         - 'Catalog: View Published Catalogs'
         - 'General: Administrator View'
-        #- 'Hybrid Cloud Operations: View from-the-cloud tunnel'
-        #- 'Hybrid Cloud Operations: View to-the-cloud tunnel'
         - 'Organization Network: View'
         - 'Organization vDC Compute Policy: View'
         - 'Organization vDC Distributed Firewall: View Rules'
@@ -359,16 +345,6 @@ vcd:
         - 'General: Administrator View'
         - 'General: Send Notification'
         - 'Group / User: View'
-        #- 'Hybrid Cloud Operations: Acquire control ticket'
-        #- 'Hybrid Cloud Operations: Acquire from-the-cloud tunnel ticket'
-        #- 'Hybrid Cloud Operations: Acquire to-the-cloud tunnel ticket'
-        #- 'Hybrid Cloud Operations: Create from-the-cloud tunnel'
-        #- 'Hybrid Cloud Operations: Create to-the-cloud tunnel'
-        #- 'Hybrid Cloud Operations: Delete from-the-cloud tunnel'
-        #- 'Hybrid Cloud Operations: Delete to-the-cloud tunnel'
-        #- 'Hybrid Cloud Operations: Update from-the-cloud tunnel endpoint tag'
-        #- 'Hybrid Cloud Operations: View from-the-cloud tunnel'
-        #- 'Hybrid Cloud Operations: View to-the-cloud tunnel'
         - 'Organization Network: Edit Properties'
         - 'Organization Network: View'
         - 'Organization vDC Compute Policy: View'
@@ -447,6 +423,18 @@ vcd:
         - 'vApp: View ACL'
         - 'vApp: View VM metrics'
         - 'vApp: VM Boot Options'
+
+  feature_flag:
+    - name: BRANDING_THEME
+      enabled: true
+    - name: FAST_CROSS_VC_INSTANTIATION
+      enabled: true
+    - name: K8S_UNIFIED
+      enabled: true
+    - name: THREE_PERSONAS
+      enabled: true
+    - name: TRANSFER_SESSION_API
+      enabled: true
 
   pvdcs:
     - name: siteA
