@@ -6,28 +6,24 @@ Documentation for the collection.
 ```
 localhost ansible_connection=local
 
-[vcd]
+[vmw_vcd]
 lab01-vcd-01.vcloud24.net  ansible_connection=ssh  ansible_host=172.16.1.7  ansible_ssh_user=root  ansible_password=VMwareVCD1.
 lab01-vcd-02.vcloud24.net  ansible_connection=ssh  ansible_host=172.16.1.8  ansible_ssh_user=root  ansible_password=VMwareVCD1.
 lab01-vcd-03.vcloud24.net  ansible_connection=ssh  ansible_host=172.16.1.9  ansible_ssh_user=root  ansible_password=VMwareVCD1.
 lab01-vcd-04.vcloud24.net  ansible_connection=ssh  ansible_host=172.16.1.10  ansible_ssh_user=root  ansible_password=VMwareVCD1.
 lab01-vcd-05.vcloud24.net  ansible_connection=ssh  ansible_host=172.16.1.11  ansible_ssh_user=root  ansible_password=VMwareVCD1.
 
-[vcd-primary]
+[vmw_vcd_primary_db]
 lab01-vcd-01.vcloud24.net
 
-[vcd-standby]
+[vmw_vcd_db]
+# lab01-vcd-01.vcloud24.net
 lab01-vcd-02.vcloud24.net
 lab01-vcd-03.vcloud24.net
 
-[vcd-application]
+[vmw_vcd_cell]
 lab01-vcd-04.vcloud24.net
 lab01-vcd-05.vcloud24.net
-
-[vcd-db]
-lab01-vcd-01.vcloud24.net
-lab01-vcd-02.vcloud24.net
-lab01-vcd-03.vcloud24.net
 ```
 
 # site.yml
