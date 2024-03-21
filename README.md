@@ -284,8 +284,8 @@ vcd:
       value: 128
 
   roles:
-    - name: SCOrgAdmin_RO
-      description: Swisscom customized read only role for Organization Administrators
+    - name: OrgAdmin_RO
+      description: customized read only role for Organization Administrators
       readonly: false
       publishAll: true
       rights:
@@ -321,8 +321,8 @@ vcd:
         - 'vApp: View ACL'
         - 'vApp: View VM metrics'
 
-    - name: SCOrgAdmin
-      description: Swisscom customized role for Organization Administrators
+    - name: OrgAdmin
+      description: customized role for Organization Administrators
       readonly: false
       publishall: true
       rights:
